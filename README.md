@@ -1,16 +1,17 @@
 # argo-cd-toolkit
 Helpful manifests, scripts, and tools for Argo CD
 
-## Hack
-Scripts under `hack/` need to be run from the `hack/` directory
+## Setup multiple clusters connected to a central Argo CD
+`start.sh` is the entrypoint to launching 4 k3d clusters, dev, qa, tst, and admin. 
+Admin is cluster which runs Argo CD and connects to all the target clusters (dev, qa, tst). 
+### Running the script
 ```shell
-cd hack/
+cd hack/multiple-clusters
 ./start.sh
 ```
-### sed
-Sed isn't the most portable binary. The scripts assume GNU sed. 
-
-#### Mac users
+#### Known issues
+Sed isn't the most portable binary. The scripts assume GNU sed.
+##### Mac users
 Won't work :(
 ```shell
 which sed       
