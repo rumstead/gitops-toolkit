@@ -26,7 +26,7 @@ precheck() {
 deployArgoCD() {
   ns="$1"
   port="$2"
-  manifestDir=$(find . -name "argo-cd" -print -quit)
+  manifestDir=$(find .. -name "argo-cd" -print -quit)
   kubectl create ns "$ns" || true
   kubectl apply -n "$ns" -k "$manifestDir"
 
