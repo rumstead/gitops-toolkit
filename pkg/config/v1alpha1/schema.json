@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rumstead/argo-cd-toolkit/pkg/config/v1alpha1/cluster",
+  "$ref": "#/$defs/Cluster",
+  "$defs": {
+    "Cluster": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "volumes": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "envs": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "additionalArgs": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "clusterAdd": {
+          "$ref": "#/$defs/ClusterAdd"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ClusterAdd": {
+      "properties": {
+        "args": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "labels": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}
