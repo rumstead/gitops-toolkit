@@ -13,17 +13,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package clusters
 
 import (
-	"fmt"
 	"os"
+	"os/exec"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"google.golang.org/protobuf/encoding/protojson"
+
+	"github.com/rumstead/argo-cd-toolkit/pkg/config/v1alpha1"
+	"github.com/rumstead/argo-cd-toolkit/pkg/distribution"
 )
 
 var cfgFile string
+
+var binaries = []string{"k3d", "docker", "kubectl", "argocd"}
 
 func NewClustersCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -37,39 +45,41 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			// validate args
+			if _, err := os.Stat(cfgFile); err != nil {
+				if os.IsNotExist(err) {
+					log.Fatalf("config file %s doesn't exist: %v", cfgFile, err)
+				}
+				return err
+			}
+			if err := checkPath(binaries); err != nil {
+				log.Fatalf("PATH is missing binaries. %v", err)
+			}
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("clusters called")
+			data, err := os.ReadFile(cfgFile)
+			if err != nil {
+				return err
+			}
+			var clusters v1alpha1.Clusters
+			if err = protojson.Unmarshal(data, &clusters); err != nil {
+				log.Fatalf("unable to parse %s cluster config: %v", cfgFile, err)
+			}
+			if err = distribution.NewCluster().Create(&clusters); err != nil {
+				return err
+			}
 			return nil
 		},
 	}
-	cmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.argo-cd-toolkit.yaml)")
+	cmd.PersistentFlags().StringVar(&cfgFile, "config", "", "path to a config file containing clusters")
 	return cmd
 }
 
-func init() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-
-		// Search config in home directory with name ".argo-cd-toolkit" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigType("yaml")
-		viper.SetConfigName(".argo-cd-toolkit")
-	}
-
-	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		_, err := fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
-		if err != nil {
-			return
+func checkPath(binaries []string) error {
+	for _, binary := range binaries {
+		if _, err := exec.LookPath(binary); err != nil {
+			return err
 		}
 	}
+	return nil
 }

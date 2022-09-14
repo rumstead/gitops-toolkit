@@ -2,15 +2,34 @@ syntax = "proto3";
 package v1alpha1;
 option go_package = ".;v1alpha1";
 
-message Cluster {
-  string name = 1;
-  map<string, string> volumes = 2;
-  map<string, string> envs = 3;
-  map<string, string> additionalArgs = 4;
-  ClusterAdd clusterAdd = 5;
+message Clusters {
+  repeated Cluster cluster = 1;
 }
 
-message ClusterAdd {
-  repeated string args = 1;
-  map<string, string> labels = 2;
+message Cluster {
+  string name = 1;
+  string network= 2;
+  GitOps gitOps = 3;
+  map<string, string> volumes = 4;
+  map<string, string> envs = 5;
+  map<string, string> additionalArgs = 6;
+  map<string, string> labels = 7;
+}
+
+message GitOps {
+  string namespace = 1;
+  string port = 2;
+  string manifestPath = 3;
+  Credentials credentials = 4;
+  map<string, ClusterArgs> clusterArgs = 5;
+}
+
+message Credentials {
+  string username = 1;
+  string password = 2;
+}
+
+message ClusterArgs {
+  map<string, string> labels = 1;
+  repeated string args = 2;
 }

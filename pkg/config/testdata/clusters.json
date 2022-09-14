@@ -1,0 +1,88 @@
+{
+  "cluster": [
+    {
+      "name": "dev",
+      "network":"localclusters",
+      "volumes": {
+        "/Users/rumstead/tmp/certs/internal-ca-bundle.crt:/etc/ssl/certs/corp.crt": ""
+      },
+      "envs": {
+        "http_proxy": "@all",
+        "https_proxy": "@all",
+        "HTTP_PROXY": "@all",
+        "HTTPS_PROXY": "@all",
+        "NO_PROXY": "@all",
+        "no_proxy": "@all"
+      },
+      "additionalArgs": {
+        "k3s-arg": "--tls-san=k3d-dev-serverlb@server:*"
+      }
+    },
+    {
+      "name": "tst",
+      "network":"localclusters",
+      "volumes": {
+        "/Users/rumstead/tmp/certs/internal-ca-bundle.crt:/etc/ssl/certs/corp.crt": ""
+      },
+      "envs": {
+        "http_proxy": "@all",
+        "https_proxy": "@all",
+        "HTTP_PROXY": "@all",
+        "HTTPS_PROXY": "@all",
+        "NO_PROXY": "@all",
+        "no_proxy": "@all"
+      },
+      "additionalArgs": {
+        "k3s-arg": "--tls-san=k3d-tst-serverlb@server:*"
+      }
+    },
+    {
+      "name": "qa",
+      "network":"localclusters",
+      "volumes": {
+        "/Users/rumstead/tmp/certs/internal-ca-bundle.crt:/etc/ssl/certs/corp.crt": ""
+      },
+      "envs": {
+        "http_proxy": "@all",
+        "https_proxy": "@all",
+        "HTTP_PROXY": "@all",
+        "HTTPS_PROXY": "@all",
+        "NO_PROXY": "@all",
+        "no_proxy": "@all"
+      },
+      "additionalArgs": {
+        "k3s-arg": "--tls-san=k3d-qa-serverlb@server:*"
+      }
+    },
+    {
+      "name": "admin",
+      "network":"localclusters",
+      "gitOps": {
+        "namespace": "argocd",
+        "port": "8080",
+        "manifestPath": "./manifests/argo-cd/",
+        "credentials": {
+          "username": "admin",
+          "password": "admin1234"
+        },
+        "clusterArgs": {
+
+        }
+      },
+      "volumes": {
+        "/Users/rumstead/tmp/certs/internal-ca-bundle.crt:/etc/ssl/certs/corp.crt": ""
+      },
+      "envs": {
+        "http_proxy": "@all",
+        "https_proxy": "@all",
+        "HTTP_PROXY": "@all",
+        "HTTPS_PROXY": "@all",
+        "NO_PROXY": "@all",
+        "no_proxy": "@all"
+      },
+      "additionalArgs": {
+        "k3s-arg": "--tls-san=k3d-admin-serverlb@server:*"
+      }
+    }
+  ]
+}
