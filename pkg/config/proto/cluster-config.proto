@@ -3,7 +3,7 @@ package v1alpha1;
 option go_package = ".;v1alpha1";
 
 message Clusters {
-  repeated Cluster cluster = 1;
+  repeated Cluster clusters = 1;
 }
 
 message Cluster {

@@ -1,10 +1,10 @@
 {
-  "cluster": [
+  "clusters": [
     {
       "name": "dev",
       "network":"localclusters",
       "volumes": {
-        "/Users/rumstead/tmp/certs/internal-ca-bundle.crt:/etc/ssl/certs/corp.crt": ""
+        "/Users/rumstead/tmp/certs/internal-ca-bundle.crt": "/etc/ssl/certs/corp.crt"
       },
       "envs": {
         "http_proxy": "@all",
@@ -22,7 +22,7 @@
       "name": "tst",
       "network":"localclusters",
       "volumes": {
-        "/Users/rumstead/tmp/certs/internal-ca-bundle.crt:/etc/ssl/certs/corp.crt": ""
+        "/Users/rumstead/tmp/certs/internal-ca-bundle.crt": "/etc/ssl/certs/corp.crt"
       },
       "envs": {
         "http_proxy": "@all",
@@ -40,7 +40,7 @@
       "name": "qa",
       "network":"localclusters",
       "volumes": {
-        "/Users/rumstead/tmp/certs/internal-ca-bundle.crt:/etc/ssl/certs/corp.crt": ""
+        "/Users/rumstead/tmp/certs/internal-ca-bundle.crt": "/etc/ssl/certs/corp.crt"
       },
       "envs": {
         "http_proxy": "@all",
@@ -70,7 +70,7 @@
         }
       },
       "volumes": {
-        "/Users/rumstead/tmp/certs/internal-ca-bundle.crt:/etc/ssl/certs/corp.crt": ""
+        "/Users/rumstead/tmp/certs/internal-ca-bundle.crt": "/etc/ssl/certs/corp.crt"
       },
       "envs": {
         "http_proxy": "@all",

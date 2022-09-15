@@ -13,6 +13,7 @@ import (
 	"github.com/k3d-io/k3d/v5/pkg/types"
 
 	"github.com/rumstead/argo-cd-toolkit/pkg/config/v1alpha1"
+	"github.com/rumstead/argo-cd-toolkit/pkg/distribution"
 	"github.com/rumstead/argo-cd-toolkit/pkg/random"
 )
 
@@ -21,11 +22,16 @@ type Cluster struct {
 
 var errorCreate = errors.New("unable to create k3d cluster")
 
+func NewCluster() distribution.Cluster {
+	return &Cluster{}
+}
+
 func (k *Cluster) Create(clusters *v1alpha1.Clusters) error {
 	if clusters == nil {
 		return fmt.Errorf("invalid clusters provided: %w", errorCreate)
 	}
-	for _, cluster := range clusters.Cluster {
+	for _, cluster := range clusters.Clusters {
+		log.Debugf("Creating cluster %s", cluster.GetName())
 		if err := createCluster(cluster); err != nil {
 			return err
 		}
@@ -42,17 +48,19 @@ func parseClusterCreateArgs(cluster *v1alpha1.Cluster) []string {
 	args = append(args, name)
 
 	for k, v := range cluster.GetEnvs() {
-		arg := fmt.Sprintf("-e %s=%s", k, v)
+		args = append(args, "-e")
+		arg := fmt.Sprintf("%s=%s", k, v)
 		args = append(args, arg)
 	}
 
 	if cluster.GetNetwork() != "" {
+		args = append(args, "--network")
 		args = append(args, cluster.GetNetwork())
 	}
 
 	for k, v := range cluster.GetVolumes() {
 		args = append(args, "--volume")
-		arg := fmt.Sprintf("%s=%s", k, v)
+		arg := fmt.Sprintf("%s:%s", k, v)
 		args = append(args, arg)
 	}
 

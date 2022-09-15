@@ -1,2 +1,3 @@
 /.idea/
 /hack/multiple-clusters/container/kubeconfig/
+/pkg/config/testdata/clusters-proxy.json

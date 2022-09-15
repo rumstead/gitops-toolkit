@@ -20,18 +20,18 @@ import (
 	"os"
 	"os/exec"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/rumstead/argo-cd-toolkit/pkg/config/v1alpha1"
-	"github.com/rumstead/argo-cd-toolkit/pkg/distribution"
+	"github.com/rumstead/argo-cd-toolkit/pkg/distribution/k3d"
+	argocd "github.com/rumstead/argo-cd-toolkit/pkg/gitops/argo-cd"
+	"github.com/rumstead/argo-cd-toolkit/pkg/logging"
 )
 
 var cfgFile string
 
-var binaries = []string{"k3d", "docker", "kubectl", "argocd"}
+var binaries = map[string]string{"k3d": "", "docker": "", "kubectl": "", "argocd": ""}
 
 func NewClustersCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -47,12 +47,12 @@ to quickly create a Cobra application.`,
 			// validate args
 			if _, err := os.Stat(cfgFile); err != nil {
 				if os.IsNotExist(err) {
-					log.Fatalf("config file %s doesn't exist: %v", cfgFile, err)
+					logging.Log().Fatalf("config file %s doesn't exist: %v", cfgFile, err)
 				}
 				return err
 			}
 			if err := checkPath(binaries); err != nil {
-				log.Fatalf("PATH is missing binaries. %v", err)
+				logging.Log().Fatalf("PATH is missing binaries. %v", err)
 			}
 			return nil
 		},
@@ -63,11 +63,32 @@ to quickly create a Cobra application.`,
 			}
 			var clusters v1alpha1.Clusters
 			if err = protojson.Unmarshal(data, &clusters); err != nil {
-				log.Fatalf("unable to parse %s cluster config: %v", cfgFile, err)
+				logging.Log().Fatalf("unable to parse %s cluster config: %v", cfgFile, err)
 			}
-			if err = distribution.NewCluster().Create(&clusters); err != nil {
-				return err
+			// create the clusters
+			if err = k3d.NewCluster().Create(&clusters); err != nil {
+				logging.Log().Fatalf("error creating clusters: %v", err)
 			}
+
+			// get any clusters to deplou gitops engine to
+			var gitopsClusters []*v1alpha1.Cluster
+			for _, cluster := range clusters.GetClusters() {
+				if cluster.GetGitOps() != nil {
+					gitopsClusters = append(gitopsClusters, cluster)
+				}
+			}
+			gitOpsEngine := argocd.NewGitOpsEngine(binaries)
+			// deploy the gitops engine to any enabled clusters
+			for _, cluster := range gitopsClusters {
+				if err = gitOpsEngine.Deploy(cluster.GetGitOps(), "/Users/rumstead/IdeaProjects/argo-cd-toolkit/hack/multiple-clusters/container/kubeconfig/admin.yaml"); err != nil {
+					logging.Log().Fatalf("error deploying gitops: %v", err)
+				}
+			}
+
+			if err = gitOpsEngine.AddClusters(&clusters); err != nil {
+				logging.Log().Fatalf("error adding cluster to gitops engine: %v", err)
+			}
+			select {}
 			return nil
 		},
 	}
@@ -75,11 +96,13 @@ to quickly create a Cobra application.`,
 	return cmd
 }
 
-func checkPath(binaries []string) error {
-	for _, binary := range binaries {
-		if _, err := exec.LookPath(binary); err != nil {
+func checkPath(binaries map[string]string) error {
+	for binary := range binaries {
+		path, err := exec.LookPath(binary)
+		if err != nil {
 			return err
 		}
+		binaries[binary] = path
 	}
 	return nil
 }

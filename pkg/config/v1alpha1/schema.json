@@ -109,7 +109,7 @@
     }
   },
   "properties": {
-    "cluster": {
+    "clusters": {
       "items": {
         "$ref": "#/$defs/Cluster"
       },
