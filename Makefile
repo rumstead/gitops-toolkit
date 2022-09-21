@@ -20,8 +20,8 @@ tidy: ## Run go vet against code.
 ##@ Build
 
 .PHONY: build
-build: fmt vet ## Build manager binary.
-	go build -o bin/argo-cd-toolkit main.go
+build: fmt vet
+	go build -o bin/gitops-toolkit main.go
 
 .PHONY: run
 run: fmt vet ## Run a controller from your host.

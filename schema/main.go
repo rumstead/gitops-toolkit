@@ -17,7 +17,7 @@ func main() {
 func generateV1Alpha1() {
 	r := new(jsonschema.Reflector)
 	r.ExpandedStruct = true
-	s := r.Reflect(&v1alpha1.Clusters{})
+	s := r.Reflect(&v1alpha1.RequestClusters{})
 	data, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
 		log.Fatal(err)

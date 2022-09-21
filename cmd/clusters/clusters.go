@@ -17,15 +17,19 @@ limitations under the License.
 package clusters
 
 import (
+	"context"
+	"fmt"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/rumstead/argo-cd-toolkit/pkg/config/v1alpha1"
-	"github.com/rumstead/argo-cd-toolkit/pkg/distribution/k3d"
-	argocd "github.com/rumstead/argo-cd-toolkit/pkg/gitops/argo-cd"
+	"github.com/rumstead/argo-cd-toolkit/pkg/gitops/argocd"
+	"github.com/rumstead/argo-cd-toolkit/pkg/kubernetes"
+	"github.com/rumstead/argo-cd-toolkit/pkg/kubernetes/k3d"
 	"github.com/rumstead/argo-cd-toolkit/pkg/logging"
 )
 
@@ -47,7 +51,8 @@ to quickly create a Cobra application.`,
 			// validate args
 			if _, err := os.Stat(cfgFile); err != nil {
 				if os.IsNotExist(err) {
-					logging.Log().Fatalf("config file %s doesn't exist: %v", cfgFile, err)
+					logging.Log().Errorf("config file %s doesn't exist: %v", cfgFile, err)
+					return err
 				}
 				return err
 			}
@@ -57,43 +62,74 @@ to quickly create a Cobra application.`,
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := context.Background()
+			// TODO: Make timeout configurable
+			timeoutCtx, timeoutFunc := context.WithTimeout(ctx, 20*time.Minute)
+			defer timeoutFunc()
 			data, err := os.ReadFile(cfgFile)
 			if err != nil {
 				return err
 			}
-			var clusters v1alpha1.Clusters
-			if err = protojson.Unmarshal(data, &clusters); err != nil {
+			var requestedClusters v1alpha1.RequestClusters
+			if err = protojson.Unmarshal(data, &requestedClusters); err != nil {
 				logging.Log().Fatalf("unable to parse %s cluster config: %v", cfgFile, err)
 			}
+
+			outputDir, err := getOutputDir()
+			if err != nil {
+				return err
+			}
+			workdir := fmt.Sprintf("%s/argo-cd-toolkit/", outputDir)
+			defer os.RemoveAll(workdir)
 			// create the clusters
-			if err = k3d.NewCluster().Create(&clusters); err != nil {
+			clusterDistro := k3d.NewK3dDistro(workdir)
+			k8sClusters, err := clusterDistro.CreateClusters(timeoutCtx, &requestedClusters)
+			if err != nil {
 				logging.Log().Fatalf("error creating clusters: %v", err)
 			}
 
-			// get any clusters to deplou gitops engine to
-			var gitopsClusters []*v1alpha1.Cluster
-			for _, cluster := range clusters.GetClusters() {
+			// get any clusters to deploy gitops engine to
+			var gitopsClusters []*kubernetes.Cluster
+			for _, cluster := range k8sClusters {
 				if cluster.GetGitOps() != nil {
 					gitopsClusters = append(gitopsClusters, cluster)
 				}
 			}
-			gitOpsEngine := argocd.NewGitOpsEngine(binaries)
+
 			// deploy the gitops engine to any enabled clusters
-			for _, cluster := range gitopsClusters {
-				if err = gitOpsEngine.Deploy(cluster.GetGitOps(), "/Users/rumstead/IdeaProjects/argo-cd-toolkit/hack/multiple-clusters/container/kubeconfig/admin.yaml"); err != nil {
-					logging.Log().Fatalf("error deploying gitops: %v", err)
-				}
+			gitOpsEngine := argocd.NewGitOpsEngine(binaries)
+			if err != nil {
+				return err
 			}
 
-			if err = gitOpsEngine.AddClusters(&clusters); err != nil {
-				logging.Log().Fatalf("error adding cluster to gitops engine: %v", err)
+			for _, ops := range gitopsClusters {
+				if err = gitOpsEngine.Deploy(ctx, ops); err != nil {
+					logging.Log().Fatalf("error deploying gitops: %v", err)
+				}
+
+				if err = gitOpsEngine.AddClusters(ctx, ops, k8sClusters); err != nil {
+					logging.Log().Fatalf("error adding cluster to gitops engine: %v", err)
+				}
 			}
-			select {}
+			// can help if running in an IDE
+			//select {}
 			return nil
 		},
 	}
 	cmd.PersistentFlags().StringVar(&cfgFile, "config", "", "path to a config file containing clusters")
 	return cmd
+}
+
+func getOutputDir() (string, error) {
+	dir := os.Getenv("OUTPUT_DIR")
+	if dir == "" {
+		dir, err := os.Getwd()
+		if err != nil {
+			return "", err
+		}
+		return dir, nil
+	}
+	return dir, nil
 }
 
 func checkPath(binaries map[string]string) error {

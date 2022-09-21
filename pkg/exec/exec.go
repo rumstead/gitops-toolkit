@@ -7,6 +7,20 @@ import (
 	"github.com/rumstead/argo-cd-toolkit/pkg/logging"
 )
 
+type Command struct {
+	Kubectl string
+	ArgoCD  string
+	CR      string
+}
+
+func NewCommand(binaries map[string]string) *Command {
+	return &Command{
+		Kubectl: binaries["kubectl"],
+		ArgoCD:  binaries["argocd"],
+		CR:      binaries["docker"],
+	}
+}
+
 func readStdOut(out chan []byte, reader io.ReadCloser) error {
 	buf, err := io.ReadAll(reader)
 	if err != nil {

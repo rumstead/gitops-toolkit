@@ -1,8 +1,38 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/rumstead/argo-cd-toolkit/pkg/config/v1alpha1/clusters",
+  "$id": "https://github.com/rumstead/argo-cd-toolkit/pkg/config/v1alpha1/request-clusters",
   "$defs": {
-    "Cluster": {
+    "Credentials": {
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "GitOps": {
+      "properties": {
+        "namespace": {
+          "type": "string"
+        },
+        "port": {
+          "type": "string"
+        },
+        "manifestPath": {
+          "type": "string"
+        },
+        "credentials": {
+          "$ref": "#/$defs/Credentials"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "RequestCluster": {
       "properties": {
         "name": {
           "type": "string"
@@ -48,70 +78,12 @@
       },
       "additionalProperties": false,
       "type": "object"
-    },
-    "ClusterArgs": {
-      "properties": {
-        "labels": {
-          "patternProperties": {
-            ".*": {
-              "type": "string"
-            }
-          },
-          "type": "object"
-        },
-        "args": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "Credentials": {
-      "properties": {
-        "username": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "GitOps": {
-      "properties": {
-        "namespace": {
-          "type": "string"
-        },
-        "port": {
-          "type": "string"
-        },
-        "manifestPath": {
-          "type": "string"
-        },
-        "credentials": {
-          "$ref": "#/$defs/Credentials"
-        },
-        "clusterArgs": {
-          "patternProperties": {
-            ".*": {
-              "$ref": "#/$defs/ClusterArgs"
-            }
-          },
-          "type": "object"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
     }
   },
   "properties": {
     "clusters": {
       "items": {
-        "$ref": "#/$defs/Cluster"
+        "$ref": "#/$defs/RequestCluster"
       },
       "type": "array"
     }

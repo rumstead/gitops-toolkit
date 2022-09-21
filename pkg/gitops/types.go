@@ -1,8 +1,12 @@
 package gitops
 
-import "github.com/rumstead/argo-cd-toolkit/pkg/config/v1alpha1"
+import (
+	"context"
+
+	"github.com/rumstead/argo-cd-toolkit/pkg/kubernetes"
+)
 
 type Engine interface {
-	Deploy(ops *v1alpha1.GitOps, kubeconfig string) error
-	AddClusters(cluster *v1alpha1.Clusters) error
+	Deploy(ctx context.Context, ops *kubernetes.Cluster) error
+	AddClusters(ctx context.Context, ops *kubernetes.Cluster, workload []*kubernetes.Cluster) error
 }

@@ -16,6 +16,13 @@
       },
       "additionalArgs": {
         "k3s-arg": "--tls-san=k3d-dev-serverlb@server:*"
+      },
+      "labels": {
+        "kubernetes.cnp.io/cluster.name": "dev",
+        "kubernetes.cnp.io/cluster.jurisdiction": "k3d",
+        "kubernetes.cnp.io/cluster.region": "muse2",
+        "kubernetes.cnp.io/cluster.segment": "multitenant",
+        "kubernetes.cnp.io/environment": "dev"
       }
     },
     {
@@ -34,6 +41,13 @@
       },
       "additionalArgs": {
         "k3s-arg": "--tls-san=k3d-tst-serverlb@server:*"
+      },
+      "labels": {
+        "kubernetes.cnp.io/cluster.name": "tst",
+        "kubernetes.cnp.io/cluster.jurisdiction": "k3d",
+        "kubernetes.cnp.io/cluster.region": "muse2",
+        "kubernetes.cnp.io/cluster.segment": "multitenant",
+        "kubernetes.cnp.io/environment": "tst"
       }
     },
     {
@@ -52,6 +66,13 @@
       },
       "additionalArgs": {
         "k3s-arg": "--tls-san=k3d-qa-serverlb@server:*"
+      },
+      "labels": {
+        "kubernetes.cnp.io/cluster.name": "qa",
+        "kubernetes.cnp.io/cluster.jurisdiction": "k3d",
+        "kubernetes.cnp.io/cluster.region": "musw2",
+        "kubernetes.cnp.io/cluster.segment": "multitenant",
+        "kubernetes.cnp.io/environment": "qa"
       }
     },
     {

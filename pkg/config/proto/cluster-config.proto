@@ -2,11 +2,11 @@ syntax = "proto3";
 package v1alpha1;
 option go_package = ".;v1alpha1";
 
-message Clusters {
-  repeated Cluster clusters = 1;
+message RequestClusters {
+  repeated RequestCluster clusters = 1;
 }
 
-message Cluster {
+message RequestCluster {
   string name = 1;
   string network= 2;
   GitOps gitOps = 3;
@@ -21,7 +21,6 @@ message GitOps {
   string port = 2;
   string manifestPath = 3;
   Credentials credentials = 4;
-  map<string, ClusterArgs> clusterArgs = 5;
 }
 
 message Credentials {
@@ -30,6 +29,5 @@ message Credentials {
 }
 
 message ClusterArgs {
-  map<string, string> labels = 1;
   repeated string args = 2;
 }
