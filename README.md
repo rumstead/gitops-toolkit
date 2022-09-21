@@ -3,11 +3,18 @@ Helpful manifests, scripts, and tools for gitops. Currently, the go binary suppo
 The first use case was is to setup an environment to test [Argo CD Application Sets](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/#introduction-to-applicationset-controller),
 specifically with [cluster generators](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Cluster/). 
 
+<<<<<<< HEAD
 ## Shell Script
 The first version of the toolkit was done via [shell scripts](hack/multiple-clusters/README.md).
 
 ## Getting Started
 ### Build/Install
+=======
+## Setup multiple clusters connected to a central Argo CD
+`start.sh` is the entrypoint to launching 4 k3d clusters, dev, qa, tst, and admin. 
+Admin is cluster which runs Argo CD and connects to all the target clusters (dev, qa, tst). 
+### Running the script
+>>>>>>> parent of 9e0fe74 (feat: update readme)
 ```shell
 make build
 ./bin/gitops-toolkit
@@ -34,6 +41,7 @@ dev     1/1       0/0      true
 qa      1/1       0/0      true
 tst     1/1       0/0      true
 ```
+<<<<<<< HEAD
 
 ### Deploys GitOps Engine
 Argo CD is deployed to any configured GitOps clusters.
@@ -60,4 +68,21 @@ cluster-k3d-tst-serverlb-756887653      Opaque   3      119m   argocd.argoproj.i
 kubernetes.cnp.io/cluster.name=tst,kubernetes.cnp.io/cluster.region=muse2,kubernetes.cnp.io/cluster.segment=multitenant,kubernetes.cnp.io/environment=tst
 cluster-k3d-qa-serverlb-3703346418      Opaque   3      119m   argocd.argoproj.io/secret-type=cluster,kubernetes.cnp.io/cluster.jurisdiction=k3d,
 kubernetes.cnp.io/cluster.name=qa,kubernetes.cnp.io/cluster.region=musw2,kubernetes.cnp.io/cluster.segment=multitenant,kubernetes.cnp.io/environment=qa
+=======
+#### Known issues
+Sed isn't the most portable binary. The scripts assume GNU sed.
+##### Mac users
+Won't work :(
+```shell
+which sed       
+# Bad
+/usr/bin/sed
+```
+Will work
+```shell
+brew install gnu-sed
+PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH" which sed
+# Good
+/usr/local/opt/gnu-sed/libexec/gnubin/sed
+>>>>>>> parent of 9e0fe74 (feat: update readme)
 ```
