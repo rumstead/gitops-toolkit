@@ -1,0 +1,33 @@
+syntax = "proto3";
+package v1alpha1;
+option go_package = ".;v1alpha1";
+
+message RequestClusters {
+  repeated RequestCluster clusters = 1;
+}
+
+message RequestCluster {
+  string name = 1;
+  string network= 2;
+  GitOps gitOps = 3;
+  map<string, string> volumes = 4;
+  map<string, string> envs = 5;
+  map<string, string> additionalArgs = 6;
+  map<string, string> labels = 7;
+}
+
+message GitOps {
+  string namespace = 1;
+  string port = 2;
+  string manifestPath = 3;
+  Credentials credentials = 4;
+}
+
+message Credentials {
+  string username = 1;
+  string password = 2;
+}
+
+message ClusterArgs {
+  repeated string args = 2;
+}

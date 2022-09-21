@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rumstead/argo-cd-toolkit/pkg/config/v1alpha1/request-clusters",
+  "$defs": {
+    "Credentials": {
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "GitOps": {
+      "properties": {
+        "namespace": {
+          "type": "string"
+        },
+        "port": {
+          "type": "string"
+        },
+        "manifestPath": {
+          "type": "string"
+        },
+        "credentials": {
+          "$ref": "#/$defs/Credentials"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "RequestCluster": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "network": {
+          "type": "string"
+        },
+        "gitOps": {
+          "$ref": "#/$defs/GitOps"
+        },
+        "volumes": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "envs": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "additionalArgs": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "labels": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  },
+  "properties": {
+    "clusters": {
+      "items": {
+        "$ref": "#/$defs/RequestCluster"
+      },
+      "type": "array"
+    }
+  },
+  "additionalProperties": false,
+  "type": "object"
+}
