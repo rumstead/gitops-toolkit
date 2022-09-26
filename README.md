@@ -1,6 +1,6 @@
 # gitops-toolkit
 Helpful manifests, scripts, and tools for gitops. Currently, the go binary supports creating N of clusters and allowing a GitOps engine to manage them.
-The first use case was is to setup an environment to test [Argo CD Application Sets](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/#introduction-to-applicationset-controller),
+The first use case was to setup an environment to test [Argo CD Application Sets](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/#introduction-to-applicationset-controller),
 specifically with [cluster generators](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Cluster/).
 
 ## Shell Script

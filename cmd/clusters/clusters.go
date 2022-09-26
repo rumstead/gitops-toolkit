@@ -112,7 +112,7 @@ to quickly create a Cobra application.`,
 				}
 			}
 			// can help if running in an IDE
-			select {}
+			//select {}
 			return nil
 		},
 	}
