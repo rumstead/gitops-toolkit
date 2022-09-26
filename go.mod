@@ -1,4 +1,4 @@
-module github.com/rumstead/argo-cd-toolkit
+module github.com/rumstead/gitops-toolkit
 
 go 1.19
 
