@@ -4,7 +4,7 @@ import (
 	"io"
 	"os/exec"
 
-	"github.com/rumstead/argo-cd-toolkit/pkg/logging"
+	"github.com/rumstead/gitops-toolkit/pkg/logging"
 )
 
 type Command struct {

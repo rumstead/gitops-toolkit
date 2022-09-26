@@ -26,11 +26,11 @@ import (
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	"github.com/rumstead/argo-cd-toolkit/pkg/config/v1alpha1"
-	"github.com/rumstead/argo-cd-toolkit/pkg/gitops/argocd"
-	"github.com/rumstead/argo-cd-toolkit/pkg/kubernetes"
-	"github.com/rumstead/argo-cd-toolkit/pkg/kubernetes/k3d"
-	"github.com/rumstead/argo-cd-toolkit/pkg/logging"
+	"github.com/rumstead/gitops-toolkit/pkg/config/v1alpha1"
+	"github.com/rumstead/gitops-toolkit/pkg/gitops/argocd"
+	"github.com/rumstead/gitops-toolkit/pkg/kubernetes"
+	"github.com/rumstead/gitops-toolkit/pkg/kubernetes/k3d"
+	"github.com/rumstead/gitops-toolkit/pkg/logging"
 )
 
 var cfgFile string
@@ -79,7 +79,7 @@ to quickly create a Cobra application.`,
 			if err != nil {
 				return err
 			}
-			workdir := fmt.Sprintf("%s/argo-cd-toolkit/", outputDir)
+			workdir := fmt.Sprintf("%s/gitops-toolkit/", outputDir)
 			defer os.RemoveAll(workdir)
 			// create the clusters
 			clusterDistro := k3d.NewK3dDistro(workdir)

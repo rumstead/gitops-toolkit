@@ -12,13 +12,13 @@ import (
 
 	"github.com/k3d-io/k3d/v5/pkg/logger"
 
-	tkexec "github.com/rumstead/argo-cd-toolkit/pkg/exec"
-	"github.com/rumstead/argo-cd-toolkit/pkg/kubernetes"
+	tkexec "github.com/rumstead/gitops-toolkit/pkg/exec"
+	"github.com/rumstead/gitops-toolkit/pkg/kubernetes"
 
 	_ "embed"
 
-	"github.com/rumstead/argo-cd-toolkit/pkg/gitops"
-	"github.com/rumstead/argo-cd-toolkit/pkg/logging"
+	"github.com/rumstead/gitops-toolkit/pkg/gitops"
+	"github.com/rumstead/gitops-toolkit/pkg/logging"
 )
 
 //go:embed embed/addClusters.sh

@@ -3,7 +3,7 @@ package gitops
 import (
 	"context"
 
-	"github.com/rumstead/argo-cd-toolkit/pkg/kubernetes"
+	"github.com/rumstead/gitops-toolkit/pkg/kubernetes"
 )
 
 type Engine interface {

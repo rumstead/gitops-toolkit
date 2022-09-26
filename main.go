@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/rumstead/argo-cd-toolkit/cmd"
+import "github.com/rumstead/gitops-toolkit/cmd"
 
 func main() {
 	cmd.Execute()

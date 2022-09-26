@@ -7,7 +7,7 @@ import (
 
 	"github.com/invopop/jsonschema"
 
-	"github.com/rumstead/argo-cd-toolkit/pkg/config/v1alpha1"
+	"github.com/rumstead/gitops-toolkit/pkg/config/v1alpha1"
 )
 
 func main() {
