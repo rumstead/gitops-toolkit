@@ -177,10 +177,11 @@ func (a *Agent) AddCluster(_ context.Context, ops, workload *kubernetes.Cluster)
 	}
 	argoUser := fmt.Sprintf("ARGOUSER=%s", ops.GetGitOps().GetCredentials().GetUsername())
 	argoPasswd := fmt.Sprintf("ARGOPASSWD=%s", ops.GetGitOps().GetCredentials().GetPassword())
-	cluster := fmt.Sprintf("CLUSTER=%s", workload.Name)
+	contextName := fmt.Sprintf("CONTEXT=%s", workload.Name)
+	clusterName := fmt.Sprintf("CLUSTER=%s", workload.RequestCluster.GetName())
 	labels := generateLabels(workload.GetLabels())
-	cmd := exec.Command(a.cmd.CR, "run", "--network", ops.GetNetwork(), "--rm", "-e", argoUser, "-e", argoPasswd, "-e", kubeConfig, "-e", cluster,
-		"-v", workDirVolume, "quay.io/argoproj/argocd:latest", "/hack/addCluster.sh", labels)
+	cmd := exec.Command(a.cmd.CR, "run", "--network", ops.GetNetwork(), "--rm", "-e", argoUser, "-e", argoPasswd, "-e", kubeConfig, "-e", contextName,
+		"-e", clusterName, "-v", workDirVolume, "quay.io/argoproj/argocd:latest", "/hack/addCluster.sh", labels)
 	if output, err := tkexec.RunCommand(cmd); err != nil {
 		return fmt.Errorf("error adding cluster to gitops agent: %s: %v", string(output), err)
 	}
