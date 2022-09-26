@@ -2,4 +2,4 @@
 /hack/multiple-clusters/container/kubeconfig/
 /pkg/config/testdata/clusters-proxy.json
 /bin/
-/argo-cd-toolkit/
+/*-toolkit/
