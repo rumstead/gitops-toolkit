@@ -185,7 +185,7 @@ func (a *Agent) AddCluster(_ context.Context, ops, workload *kubernetes.Cluster)
 	if output, err := tkexec.RunCommand(cmd); err != nil {
 		return fmt.Errorf("error adding cluster to gitops agent: %s: %v", string(output), err)
 	}
-	logging.Log().Infof("added cluster %s to argo cd\n", workload.Name)
+	logging.Log().Infof("added cluster %s to argo cd\n", workload.RequestCluster.GetName())
 	return nil
 }
 

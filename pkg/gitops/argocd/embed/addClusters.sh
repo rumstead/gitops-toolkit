@@ -7,4 +7,4 @@ set -o pipefail
 argocd login host.docker.internal:8080 --insecure --username "$ARGOUSER" --password "$ARGOPASSWD"
 
 # don't quote $1 so it globs
-argocd cluster add -y --upsert "CONTEXT" --insecure --name "$CLUSTER" --kubeconfig "$KUBECONFIG" $1
+argocd cluster add -y --upsert "$CONTEXT" --insecure --name "$CLUSTER" --kubeconfig "$KUBECONFIG" $1
