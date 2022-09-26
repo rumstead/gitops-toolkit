@@ -1,7 +1,7 @@
 # gitops-toolkit
-Helpful manifests, scripts, and tools for gitops. Currently, the go binary supports creating N of clusters and allowing a GitOps engine to manage them. 
+Helpful manifests, scripts, and tools for gitops. Currently, the go binary supports creating N of clusters and allowing a GitOps engine to manage them.
 The first use case was is to setup an environment to test [Argo CD Application Sets](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/#introduction-to-applicationset-controller),
-specifically with [cluster generators](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Cluster/). 
+specifically with [cluster generators](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Cluster/).
 
 ## Shell Script
 The first version of the toolkit was done via [shell scripts](hack/multiple-clusters/README.md).
@@ -19,7 +19,7 @@ go install github.com/rumstead/gitops-toolkit
 The script reads a json configuration file to create clusters. Order of the clusters matters because of how K3d updates DNS. The bottom most cluster can
 address all cluster above it.
 #### Schema
-A json schema file can be found [here](pkg/config/v1alpha1/schema.json) with a [sample](pkg/config/testdata/clusters.json). 
+A json schema file can be found [here](pkg/config/v1alpha1/schema.json) with a [sample](pkg/config/testdata/clusters.json).
 #### Generating a configuration file
 You can use the [proto structs](pkg/config/v1alpha1/cluster-config.pb.go) to write your configuration in code and dump them out as json.
 ## What is happening under the covers?
@@ -49,7 +49,7 @@ argocd-dex-server                  1/1     1            1           130m
 ```
 
 ### Link clusters to GitOps Engine
-Argo CD is the only supported GitOps Engine. 
+Argo CD is the only supported GitOps Engine.
 ```shell
 kgsec -n  argocd --show-labels -l argocd.argoproj.io/secret-type=cluster 
 NAME                                    TYPE     DATA   AGE    LABELS
