@@ -3,7 +3,7 @@ package kubernetes
 import (
 	"context"
 
-	"github.com/rumstead/argo-cd-toolkit/pkg/config/v1alpha1"
+	"github.com/rumstead/gitops-toolkit/pkg/config/v1alpha1"
 )
 
 type Distro interface {

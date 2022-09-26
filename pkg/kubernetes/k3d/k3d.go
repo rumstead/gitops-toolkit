@@ -11,9 +11,9 @@ import (
 	"github.com/k3d-io/k3d/v5/pkg/types"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/rumstead/argo-cd-toolkit/pkg/config/v1alpha1"
-	"github.com/rumstead/argo-cd-toolkit/pkg/kubernetes"
-	"github.com/rumstead/argo-cd-toolkit/pkg/random"
+	"github.com/rumstead/gitops-toolkit/pkg/config/v1alpha1"
+	"github.com/rumstead/gitops-toolkit/pkg/kubernetes"
+	"github.com/rumstead/gitops-toolkit/pkg/random"
 )
 
 type K3d struct {

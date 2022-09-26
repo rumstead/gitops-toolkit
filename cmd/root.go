@@ -19,12 +19,12 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/rumstead/argo-cd-toolkit/cmd/clusters"
+	"github.com/rumstead/gitops-toolkit/cmd/clusters"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "argo-cd-toolkit",
+	Use:   "gitops-toolkit",
 	Short: "A brief description of your application",
 	Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:

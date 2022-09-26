@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/rumstead/argo-cd-toolkit/pkg/config/v1alpha1/request-clusters",
+  "$id": "https://github.com/rumstead/gitops-toolkit/pkg/config/v1alpha1/request-clusters",
   "$defs": {
     "Credentials": {
       "properties": {
