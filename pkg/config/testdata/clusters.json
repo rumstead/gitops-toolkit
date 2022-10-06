@@ -85,9 +85,6 @@
         "credentials": {
           "username": "admin",
           "password": "admin1234"
-        },
-        "clusterArgs": {
-
         }
       },
       "volumes": {
