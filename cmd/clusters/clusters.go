@@ -19,18 +19,17 @@ package clusters
 import (
 	"context"
 	"fmt"
+	"github.com/ghodss/yaml"
 	"os"
 	"os/exec"
 	"time"
-
-	"github.com/spf13/cobra"
-	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/rumstead/gitops-toolkit/pkg/config/v1alpha1"
 	"github.com/rumstead/gitops-toolkit/pkg/gitops/argocd"
 	"github.com/rumstead/gitops-toolkit/pkg/kubernetes"
 	"github.com/rumstead/gitops-toolkit/pkg/kubernetes/k3d"
 	"github.com/rumstead/gitops-toolkit/pkg/logging"
+	"github.com/spf13/cobra"
 )
 
 var cfgFile string
@@ -71,7 +70,7 @@ to quickly create a Cobra application.`,
 				return err
 			}
 			var requestedClusters v1alpha1.RequestClusters
-			if err = protojson.Unmarshal(data, &requestedClusters); err != nil {
+			if err = yaml.Unmarshal(data, &requestedClusters); err != nil {
 				logging.Log().Fatalf("unable to parse %s cluster config: %v", cfgFile, err)
 			}
 
