@@ -115,8 +115,15 @@ to quickly create a Cobra application.`,
 			return nil
 		},
 	}
-	cmd.PersistentFlags().StringVar(&cfgFile, "config", "", "path to a config file containing clusters")
+	defaultClusterConfigPath := getDefaultClusterConfig()
+	cmd.PersistentFlags().StringVar(&cfgFile, "config", defaultClusterConfigPath, "path to a config file containing clusters")
 	return cmd
+}
+
+func getDefaultClusterConfig() (filePath string) {
+	homeDir, _ := os.UserHomeDir()
+	filePath = fmt.Sprintf("%s/.gitops-toolkit-clusters.yaml", homeDir)
+	return
 }
 
 func getOutputDir() (string, error) {
