@@ -74,6 +74,14 @@
             }
           },
           "type": "object"
+        },
+        "annotations": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
         }
       },
       "additionalProperties": false,
