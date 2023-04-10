@@ -192,7 +192,7 @@ func (a *Agent) AddCluster(_ context.Context, ops, workload *kubernetes.Cluster)
 
 func generateArgs(argType clusterArgs, metadata map[string]string) string {
 	var builder strings.Builder
-	for k, v := range labels {
+	for k, v := range metadata {
 		builder.WriteString(string(argType))
 		builder.WriteString(" ")
 		builder.WriteString(k)
