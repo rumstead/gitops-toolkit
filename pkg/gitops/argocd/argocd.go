@@ -180,13 +180,13 @@ func (a *Agent) AddCluster(_ context.Context, ops, workload *kubernetes.Cluster)
 	contextName := fmt.Sprintf("CONTEXT=%s", workload.Name)
 	clusterName := fmt.Sprintf("CLUSTER=%s", workload.RequestCluster.GetName())
 	labels := generateArgs(clusterArgLabels, workload.GetLabels())
-	annotations := generateArgs(clusterArgAnnotations, workload.GetLabels())
+	annotations := generateArgs(clusterArgAnnotations, workload.GetAnnotations())
 	cmd := exec.Command(a.cmd.CR, "run", "--network", ops.GetNetwork(), "--rm", "-e", argoUser, "-e", argoPasswd, "-e", kubeConfig, "-e", contextName,
-		"-e", clusterName, "-v", workDirVolume, "quay.io/argoproj/argocd:latest", "/hack/addCluster.sh", labels, annotations)
+		"-e", clusterName, "-v", workDirVolume, "quay.io/argoproj/argocd:latest", "/hack/addCluster.sh", labels+annotations)
 	if output, err := tkexec.RunCommand(cmd); err != nil {
 		return fmt.Errorf("error adding cluster to gitops agent: %s: %v", string(output), err)
 	}
-	logging.Log().Infof("added cluster %s to argo cd\n", workload.RequestCluster.GetName())
+	logging.Log().Infof("added cluster %s to argo cd", workload.RequestCluster.GetName())
 	return nil
 }
 
