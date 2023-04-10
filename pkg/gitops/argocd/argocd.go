@@ -190,7 +190,7 @@ func (a *Agent) AddCluster(_ context.Context, ops, workload *kubernetes.Cluster)
 	return nil
 }
 
-func generateArgs(argType clusterArgs, labels map[string]string) string {
+func generateArgs(argType clusterArgs, metadata map[string]string) string {
 	var builder strings.Builder
 	for k, v := range labels {
 		builder.WriteString(string(argType))
