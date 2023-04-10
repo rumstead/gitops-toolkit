@@ -3,6 +3,7 @@ module github.com/rumstead/gitops-toolkit
 go 1.19
 
 require (
+	github.com/ghodss/yaml v1.0.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.3
 	github.com/invopop/jsonschema v0.6.0
 	github.com/k3d-io/k3d/v5 v5.4.6
@@ -33,7 +34,6 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/fvbommel/sortorder v1.0.2 // indirect
-	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-test/deep v1.0.8 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect

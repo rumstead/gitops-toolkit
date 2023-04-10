@@ -179,20 +179,21 @@ func (a *Agent) AddCluster(_ context.Context, ops, workload *kubernetes.Cluster)
 	argoPasswd := fmt.Sprintf("ARGOPASSWD=%s", ops.GetGitOps().GetCredentials().GetPassword())
 	contextName := fmt.Sprintf("CONTEXT=%s", workload.Name)
 	clusterName := fmt.Sprintf("CLUSTER=%s", workload.RequestCluster.GetName())
-	labels := generateLabels(workload.GetLabels())
+	labels := generateArgs(clusterArgLabels, workload.GetLabels())
+	annotations := generateArgs(clusterArgAnnotations, workload.GetAnnotations())
 	cmd := exec.Command(a.cmd.CR, "run", "--network", ops.GetNetwork(), "--rm", "-e", argoUser, "-e", argoPasswd, "-e", kubeConfig, "-e", contextName,
-		"-e", clusterName, "-v", workDirVolume, "quay.io/argoproj/argocd:latest", "/hack/addCluster.sh", labels)
+		"-e", clusterName, "-v", workDirVolume, "quay.io/argoproj/argocd:latest", "/hack/addCluster.sh", labels+annotations)
 	if output, err := tkexec.RunCommand(cmd); err != nil {
 		return fmt.Errorf("error adding cluster to gitops agent: %s: %v", string(output), err)
 	}
-	logging.Log().Infof("added cluster %s to argo cd\n", workload.RequestCluster.GetName())
+	logging.Log().Infof("added cluster %s to argo cd", workload.RequestCluster.GetName())
 	return nil
 }
 
-func generateLabels(labels map[string]string) string {
+func generateArgs(argType clusterArgs, metadata map[string]string) string {
 	var builder strings.Builder
-	for k, v := range labels {
-		builder.WriteString("--label")
+	for k, v := range metadata {
+		builder.WriteString(string(argType))
 		builder.WriteString(" ")
 		builder.WriteString(k)
 		builder.WriteString("=")
