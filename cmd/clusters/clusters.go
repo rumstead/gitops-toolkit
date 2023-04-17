@@ -19,10 +19,11 @@ package clusters
 import (
 	"context"
 	"fmt"
-	"github.com/ghodss/yaml"
 	"os"
 	"os/exec"
 	"time"
+
+	"github.com/ghodss/yaml"
 
 	"github.com/rumstead/gitops-toolkit/pkg/config/v1alpha1"
 	"github.com/rumstead/gitops-toolkit/pkg/gitops/argocd"
@@ -39,13 +40,8 @@ var binaries = map[string]string{"k3d": "", "docker": "", "kubectl": "", "argocd
 func NewClustersCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "clusters",
-		Short: "A brief description of your command",
-		Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+		Short: "Create a set of k3d clusters managed by Argo CD",
+		Long:  ``,
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			// validate args
 			if _, err := os.Stat(cfgFile); err != nil {
@@ -111,7 +107,6 @@ to quickly create a Cobra application.`,
 				}
 			}
 			// can help if running in an IDE
-			//select {}
 			return nil
 		},
 	}
@@ -129,11 +124,7 @@ func getDefaultClusterConfig() (filePath string) {
 func getOutputDir() (string, error) {
 	dir := os.Getenv("OUTPUT_DIR")
 	if dir == "" {
-		dir, err := os.Getwd()
-		if err != nil {
-			return "", err
-		}
-		return dir, nil
+		return os.TempDir(), nil
 	}
 	return dir, nil
 }
