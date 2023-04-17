@@ -3,3 +3,4 @@
 /pkg/config/testdata/clusters-proxy.json
 /bin/
 /*-toolkit/
+/pkg/config/testdata/clusters-proxy.yaml
