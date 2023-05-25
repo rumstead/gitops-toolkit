@@ -60,12 +60,10 @@
           "type": "object"
         },
         "additionalArgs": {
-          "patternProperties": {
-            ".*": {
-              "type": "string"
-            }
+          "items": {
+            "type": "string"
           },
-          "type": "object"
+          "type": "array"
         },
         "labels": {
           "patternProperties": {

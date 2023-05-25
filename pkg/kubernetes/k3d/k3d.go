@@ -80,11 +80,8 @@ func parseClusterCreateArgs(cluster *v1alpha1.RequestCluster) []string {
 		args = append(args, arg)
 	}
 
-	for k, v := range cluster.GetAdditionalArgs() {
-		if k == "k3s-arg" {
-			k = "--k3s-arg"
-		}
-		arg := fmt.Sprintf("%s=%s", k, v)
+	for _, v := range cluster.GetAdditionalArgs() {
+		arg := fmt.Sprintf("%s", v)
 		args = append(args, arg)
 	}
 	return args
