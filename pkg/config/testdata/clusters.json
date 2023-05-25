@@ -2,7 +2,7 @@
   "clusters": [
     {
       "name": "dev",
-      "network":"localclusters",
+      "network": "localclusters",
       "volumes": {
         "/Users/rumstead/tmp/certs/internal-ca-bundle.crt": "/etc/ssl/certs/corp.crt"
       },
@@ -14,9 +14,10 @@
         "NO_PROXY": "@all",
         "no_proxy": "@all"
       },
-      "additionalArgs": {
-        "k3s-arg": "--tls-san=k3d-dev-serverlb@server:*"
-      },
+      "additionalArgs": [
+        "--k3s-arg=--tls-san=k3d-dev-serverlb@server:*",
+        "--image=rancher/k3s:v1.26.4-rc1-k3s1"
+      ],
       "labels": {
         "kubernetes.cnp.io/cluster.name": "dev",
         "kubernetes.cnp.io/cluster.jurisdiction": "k3d",
@@ -27,7 +28,7 @@
     },
     {
       "name": "tst",
-      "network":"localclusters",
+      "network": "localclusters",
       "volumes": {
         "/Users/rumstead/tmp/certs/internal-ca-bundle.crt": "/etc/ssl/certs/corp.crt"
       },
@@ -39,9 +40,10 @@
         "NO_PROXY": "@all",
         "no_proxy": "@all"
       },
-      "additionalArgs": {
-        "k3s-arg": "--tls-san=k3d-tst-serverlb@server:*"
-      },
+      "additionalArgs": [
+        "--k3s-arg=--tls-san=k3d-tst-serverlb@server:*",
+        "--image=rancher/k3s:v1.26.4-rc1-k3s1"
+      ],
       "labels": {
         "kubernetes.cnp.io/cluster.name": "tst",
         "kubernetes.cnp.io/cluster.jurisdiction": "k3d",
@@ -52,7 +54,7 @@
     },
     {
       "name": "qa",
-      "network":"localclusters",
+      "network": "localclusters",
       "volumes": {
         "/Users/rumstead/tmp/certs/internal-ca-bundle.crt": "/etc/ssl/certs/corp.crt"
       },
@@ -64,9 +66,10 @@
         "NO_PROXY": "@all",
         "no_proxy": "@all"
       },
-      "additionalArgs": {
-        "k3s-arg": "--tls-san=k3d-qa-serverlb@server:*"
-      },
+      "additionalArgs": [
+        "--k3s-arg=--tls-san=k3d-qa-serverlb@server:*",
+        "--image=rancher/k3s:v1.26.4-rc1-k3s1"
+      ],
       "labels": {
         "kubernetes.cnp.io/cluster.name": "qa",
         "kubernetes.cnp.io/cluster.jurisdiction": "k3d",
@@ -77,7 +80,7 @@
     },
     {
       "name": "admin",
-      "network":"localclusters",
+      "network": "localclusters",
       "gitOps": {
         "namespace": "argocd",
         "port": "8080",
@@ -98,9 +101,10 @@
         "NO_PROXY": "@all",
         "no_proxy": "@all"
       },
-      "additionalArgs": {
-        "k3s-arg": "--tls-san=k3d-admin-serverlb@server:*"
-      }
+      "additionalArgs": [
+        "--k3s-arg=--tls-san=k3d-admin-serverlb@server:*",
+        "--image=rancher/k3s:v1.26.4-rc1-k3s1"
+      ]
     }
   ]
 }

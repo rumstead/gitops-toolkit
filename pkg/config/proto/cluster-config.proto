@@ -12,7 +12,7 @@ message RequestCluster {
   GitOps gitOps = 3;
   map<string, string> volumes = 4;
   map<string, string> envs = 5;
-  map<string, string> additionalArgs = 6;
+  repeated string additionalArgs = 6;
   map<string, string> labels = 7;
   map<string, string> annotations = 8;
 }
