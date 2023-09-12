@@ -22,7 +22,7 @@ go install github.com/rumstead/gitops-toolkit
 The script reads a json/yaml configuration file to create clusters. Order of the clusters matters because of how K3d updates DNS. The bottom cluster can
 address all cluster above it.
 #### Schema
-A json schema file can be found [here](pkg/config/v1alpha1/schema.json) with a [sample](pkg/config/testdata/clusters.json). Similar a yaml example file is [here](pkg/config/testdata/clusters.yaml).
+A json schema file can be found [here](pkg/config/v1alpha1/schema.json) with a [sample](pkg/config/testdata/clusters.json). Similarly, a yaml example file is [here](pkg/config/testdata/clusters.yaml).
 #### Generating a configuration file
 You can use the [proto structs](pkg/config/v1alpha1/cluster-config.pb.go) to write your configuration in code and dump them out as json.
 ## What is happening under the covers?
