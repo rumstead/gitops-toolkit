@@ -33,6 +33,7 @@ func NewGitOpsEngine(binaries map[string]string) gitops.Engine {
 }
 
 func (a *Agent) Deploy(ctx context.Context, ops *kubernetes.Cluster) error {
+	logging.Log().Infoln("Deploying Argo CD")
 	if _, err := os.Stat(ops.KubeConfigPath); err != nil {
 		return err
 	}
@@ -181,8 +182,16 @@ func (a *Agent) AddCluster(_ context.Context, ops, workload *kubernetes.Cluster)
 	clusterName := fmt.Sprintf("CLUSTER=%s", workload.RequestCluster.GetName())
 	labels := generateArgs(clusterArgLabels, workload.GetLabels())
 	annotations := generateArgs(clusterArgAnnotations, workload.GetAnnotations())
-	cmd := exec.Command(a.cmd.CR, "run", "--network", ops.GetNetwork(), "--rm", "-e", argoUser, "-e", argoPasswd, "-e", kubeConfig, "-e", contextName,
-		"-e", clusterName, "-v", workDirVolume, "quay.io/argoproj/argocd:latest", "/hack/addCluster.sh", labels+annotations)
+	cmd := exec.Command(a.cmd.CR, "run", "--network", ops.GetNetwork(), "--rm",
+		"-e", argoUser,
+		"-e", argoPasswd,
+		"-e", kubeConfig,
+		"-e", contextName,
+		"-e", clusterName,
+		"-e", "CRI_GATEWAY",
+		"-v", workDirVolume,
+		"quay.io/argoproj/argocd:latest", "/hack/addCluster.sh", labels+annotations)
+	logging.Log().Debugf("%s\n", cmd.String())
 	if output, err := tkexec.RunCommand(cmd); err != nil {
 		return fmt.Errorf("error adding cluster to gitops agent: %s: %v", string(output), err)
 	}

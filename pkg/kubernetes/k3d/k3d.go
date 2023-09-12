@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 
 	k3dcluster "github.com/k3d-io/k3d/v5/cmd/cluster"
 	k3dclient "github.com/k3d-io/k3d/v5/pkg/client"
@@ -34,6 +35,10 @@ func (k *K3d) getKubeConfig(ctx context.Context, cluster *v1alpha1.RequestCluste
 		OverwriteExisting:    false,
 	})
 	if err != nil {
+		return "", err
+	}
+	// allow anyone to read the file since it will be consumed by the gitops agent later.
+	if err = os.Chmod(output, 0755); err != nil {
 		return "", err
 	}
 	return output, nil
