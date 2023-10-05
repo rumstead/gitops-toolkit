@@ -1,8 +1,11 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/rumstead/gitops-toolkit)](https://goreportcard.com/badge/github.com/rumstead/gitops-toolkit)
 # gitops-toolkit
 Helpful manifests, scripts, and tools for gitops. Currently, the go binary supports creating N of clusters and allowing a GitOps engine to manage them.
-The first use case was to setup an environment to test [Argo CD Application Sets](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/#introduction-to-applicationset-controller),
+The first use case was to set up an environment to test [Argo CD Application Sets](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/#introduction-to-applicationset-controller),
 specifically with [cluster generators](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators-Cluster/).
+
+## Troubleshooting
+See the [troubleshooting guide](TROUBLESHOOTING.md).
 
 ## Shell Script
 The first version of the toolkit was done via [shell scripts](hack/multiple-clusters/README.md).
@@ -17,10 +20,10 @@ make build
 go install github.com/rumstead/gitops-toolkit
 ```
 ### Configuring
-The script reads a json configuration file to create clusters. Order of the clusters matters because of how K3d updates DNS. The bottom most cluster can
+The script reads a json/yaml configuration file to create clusters. Order of the clusters matters because of how K3d updates DNS. The bottom cluster can
 address all cluster above it.
 #### Schema
-A json schema file can be found [here](pkg/config/v1alpha1/schema.json) with a [sample](pkg/config/testdata/clusters.json).
+A json schema file can be found [here](pkg/config/v1alpha1/schema.json) with a [sample](pkg/config/testdata/clusters.json). Similarly, a yaml example file is [here](pkg/config/testdata/clusters.yaml).
 #### Generating a configuration file
 You can use the [proto structs](pkg/config/v1alpha1/cluster-config.pb.go) to write your configuration in code and dump them out as json.
 ## What is happening under the covers?
