@@ -1,3 +1,4 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/rumstead/gitops-toolkit)](https://goreportcard.com/badge/github.com/rumstead/gitops-toolkit)
 # gitops-toolkit
 Helpful manifests, scripts, and tools for gitops. Currently, the go binary supports creating N of clusters and allowing a GitOps engine to manage them.
 The first use case was to setup an environment to test [Argo CD Application Sets](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/#introduction-to-applicationset-controller),
