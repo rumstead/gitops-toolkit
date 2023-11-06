@@ -35,7 +35,7 @@ import (
 
 var cfgFile string
 
-var binaries = map[string]string{"k3d": "", "docker": "", "kubectl": "", "argocd": ""}
+var binaries = map[string]string{"k3d": "k3d", "docker": "docker", "kubectl": "kubectl", "argocd": "argocd"}
 
 func NewClustersCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -75,7 +75,12 @@ func NewClustersCmd() *cobra.Command {
 				return err
 			}
 			workdir := fmt.Sprintf("%s/gitops-toolkit/", outputDir)
-			defer os.RemoveAll(workdir)
+			defer func(path string) {
+				err := os.RemoveAll(path)
+				if err != nil {
+					logging.Log().Error(err)
+				}
+			}(workdir)
 			// create the clusters
 			clusterDistro := k3d.NewK3dDistro(workdir)
 			k8sClusters, err := clusterDistro.CreateClusters(timeoutCtx, &requestedClusters)
@@ -131,11 +136,10 @@ func getOutputDir() (string, error) {
 
 func checkPath(binaries map[string]string) error {
 	for binary := range binaries {
-		path, err := exec.LookPath(binary)
+		_, err := exec.LookPath(binary)
 		if err != nil {
 			return err
 		}
-		binaries[binary] = path
 	}
 	return nil
 }
