@@ -27,6 +27,9 @@
         },
         "credentials": {
           "$ref": "#/$defs/Credentials"
+        },
+        "pForward": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,

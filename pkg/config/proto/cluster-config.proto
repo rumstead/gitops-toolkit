@@ -22,6 +22,7 @@ message GitOps {
   string port = 2;
   string manifestPath = 3;
   Credentials credentials = 4;
+  bool pForward = 6;
 }
 
 message Credentials {
