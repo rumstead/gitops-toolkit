@@ -98,7 +98,7 @@ func (a *Agent) deployArgoCD(_ context.Context, ops *kubernetes.Cluster) error {
 	logging.Log().Debugf("port forwarding on %s\n", ops.GetGitOps().GetPort())
 	// 4. port forward
 	// if port forward is not required return nil now
-	if !ops.GetGitOps().GetPForward() {
+	if ops.GetGitOps().GetNoPortForward() {
 		logging.Log().Infoln("Port forward is not required")
 		return nil
 	}

@@ -28,7 +28,7 @@
         "credentials": {
           "$ref": "#/$defs/Credentials"
         },
-        "pForward": {
+        "NoPortForward": {
           "type": "boolean"
         }
       },
