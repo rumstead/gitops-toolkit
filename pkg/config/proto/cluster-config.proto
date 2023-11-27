@@ -21,8 +21,8 @@ message GitOps {
   string namespace = 1;
   string port = 2;
   string manifestPath = 3;
-  Credentials credentials = 4;
-  bool noPortForward = 6;
+  bool noPortForward = 4;
+  Credentials credentials = 5;
 }
 
 message Credentials {

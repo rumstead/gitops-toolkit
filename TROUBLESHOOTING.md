@@ -14,5 +14,5 @@ You can add required flags, such as `--grpc-web`, to the argocd commands by addi
 Ie, `ARGOFLAGS=--grpc-web`
 
 ## Are you using wsl and host.docker.internal does not work?
-You can pass a host name or IP address via the `ARGOHOST` environment variable.
-Ie, `ARGOHOST=my-host` or `ARGOHOST=172.18.0.1`
+You can pass a host name or IP address via the `DOCKERGATEWAY` environment variable.
+Ie, `DOCKERGATEWAY=my-gateway` or `DOCKERGATEWAY=172.18.0.1`

@@ -25,11 +25,11 @@
         "manifestPath": {
           "type": "string"
         },
-        "credentials": {
-          "$ref": "#/$defs/Credentials"
-        },
         "noPortForward": {
           "type": "boolean"
+        },
+        "credentials": {
+          "$ref": "#/$defs/Credentials"
         }
       },
       "additionalProperties": false,

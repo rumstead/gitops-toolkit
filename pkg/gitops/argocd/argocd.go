@@ -104,7 +104,7 @@ func (a *Agent) deployArgoCD(_ context.Context, ops *kubernetes.Cluster) error {
 	}
 	// use start because we do not want to wait
 	port := fmt.Sprintf("%s:8080", ops.GetGitOps().GetPort())
-	cmd = exec.Command(a.cmd.Kubectl, "port-forward", "-n", ops.GetGitOps().GetNamespace(), "deploy/argocd-server", port)
+	cmd = exec.Command(a.cmd.Kubectl, "port-forward", "-n", ops.GetGitOps().GetNamespace(), "deploy/argocd-server", port, "--address", "0.0.0.0")
 	pid, err := tkexec.StartCommand(cmd)
 	if err != nil {
 		return fmt.Errorf("could not port foward argo server: %v", err)
@@ -197,8 +197,9 @@ func (a *Agent) AddCluster(_ context.Context, ops, workload *kubernetes.Cluster)
 		"-e", clusterName,
 		"-e", "CRI_GATEWAY",
 		"-e", "ARGOFLAGS",
-		"-e", "ARGOHOST",
+		"-e", "DOCKERGATEWAY",
 		"-v", workDirVolume,
+		"-h", "0.0.0.0",
 		"quay.io/argoproj/argocd:latest", "/hack/addCluster.sh", labels+annotations)
 	logging.Log().Debugf("%s\n", cmd.String())
 	if output, err := tkexec.RunCommand(cmd); err != nil {
