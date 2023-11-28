@@ -199,7 +199,6 @@ func (a *Agent) AddCluster(_ context.Context, ops, workload *kubernetes.Cluster)
 		"-e", "ARGOFLAGS",
 		"-e", "DOCKERGATEWAY",
 		"-v", workDirVolume,
-		"-h", "0.0.0.0",
 		"quay.io/argoproj/argocd:latest", "/hack/addCluster.sh", labels+annotations)
 	logging.Log().Debugf("%s\n", cmd.String())
 	if output, err := tkexec.RunCommand(cmd); err != nil {
