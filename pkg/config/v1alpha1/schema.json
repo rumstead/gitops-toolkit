@@ -25,6 +25,9 @@
         "manifestPath": {
           "type": "string"
         },
+        "noPortForward": {
+          "type": "boolean"
+        },
         "credentials": {
           "$ref": "#/$defs/Credentials"
         }
