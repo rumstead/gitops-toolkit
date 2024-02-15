@@ -71,7 +71,7 @@ func (a *Agent) deployArgoCD(_ context.Context, ops *kubernetes.Cluster) error {
 	}
 	// 1a. wait for the cluster to be ready
 	logging.Log().Debugln("waiting for cluster to be ready")
-	cmd = exec.Command(a.cmd.Kubectl, "wait", "-n", "kube-system", "job/helm-install-traefik", "--for", "condition=complete", "--timeout", "5m")
+	cmd = exec.Command(a.cmd.Kubectl, "wait", "-n", "kube-system", "deploy/coredns", "--for", "condition=available", "--timeout", "5m")
 	if output, err := tkexec.RunCommand(cmd); err != nil {
 		return fmt.Errorf("error waiting for cluster: %s: %v", string(output), err)
 	}
@@ -102,9 +102,9 @@ func (a *Agent) deployArgoCD(_ context.Context, ops *kubernetes.Cluster) error {
 		logging.Log().Infoln("Port forward is not required")
 		return nil
 	}
-	// use start because we do not want to wait
 	port := fmt.Sprintf("%s:8080", ops.GetGitOps().GetPort())
 	cmd = exec.Command(a.cmd.Kubectl, "port-forward", "-n", ops.GetGitOps().GetNamespace(), "deploy/argocd-server", port, "--address", "0.0.0.0")
+	// use start because we do not want to wait for the process to finish
 	pid, err := tkexec.StartCommand(cmd)
 	if err != nil {
 		return fmt.Errorf("could not port foward argo server: %v", err)
@@ -201,7 +201,7 @@ func (a *Agent) AddCluster(_ context.Context, ops, workload *kubernetes.Cluster)
 		"quay.io/argoproj/argocd:latest", "/hack/addCluster.sh", labels+annotations)
 	logging.Log().Debugf("%s\n", cmd.String())
 	if output, err := tkexec.RunCommand(cmd); err != nil {
-		return fmt.Errorf("error adding cluster to gitops agent: %s: %v", string(output), err)
+		return fmt.Errorf("error adding cluster to gitops agent: %s: %v", output, err)
 	}
 	logging.Log().Infof("added cluster %s to argo cd", workload.RequestCluster.GetName())
 	return nil
