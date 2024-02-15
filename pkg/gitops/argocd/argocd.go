@@ -61,37 +61,36 @@ func (a *Agent) deployArgoCD(_ context.Context, ops *kubernetes.Cluster) error {
 	cmd := exec.Command(a.cmd.Kubectl, "create", "ns", ops.GetGitOps().GetNamespace())
 	// 1. create the ns
 	if output, err := tkexec.RunCommand(cmd); err != nil {
-		outputStr := string(output)
 		// we don't want to error out if the namespace already exists
-		if !strings.Contains(outputStr, "already exists") {
-			return fmt.Errorf("error creating namespace: %s: %v", outputStr, err)
+		if !strings.Contains(output, "already exists") {
+			return fmt.Errorf("error creating namespace: %s: %v", output, err)
 		} else {
 			logging.Log().Infof("using the existing namespace: %s\n", ops.GetGitOps().GetNamespace())
 		}
 	}
 	// 1a. wait for the cluster to be ready
 	logging.Log().Debugln("waiting for cluster to be ready")
-	cmd = exec.Command(a.cmd.Kubectl, "wait", "-n", "kube-system", "job/helm-install-traefik", "--for", "condition=complete", "--timeout", "5m")
+	cmd = exec.Command(a.cmd.Kubectl, "wait", "-n", "kube-system", "deploy/coredns", "--for", "condition=available", "--timeout", "5m")
 	if output, err := tkexec.RunCommand(cmd); err != nil {
-		return fmt.Errorf("error waiting for cluster: %s: %v", string(output), err)
+		return fmt.Errorf("error waiting for cluster: %s: %v", output, err)
 	}
 
 	logging.Log().Debugln("deploying argo cd")
 	// 2. apply the manifests
 	cmd = exec.Command(a.cmd.Kubectl, "apply", "-n", ops.GetGitOps().GetNamespace(), "-k", ops.GetGitOps().GetManifestPath())
 	if output, err := tkexec.RunCommand(cmd); err != nil {
-		return fmt.Errorf("error applying argo cd manifests at %s: %s: %v", ops.GetGitOps().GetManifestPath(), string(output), err)
+		return fmt.Errorf("error applying argo cd manifests at %s: %s: %v", ops.GetGitOps().GetManifestPath(), output, err)
 	}
 	logging.Log().Debugln("waiting for argo server and redis start up")
 	// 3. wait for start up
 	cmd = exec.Command(a.cmd.Kubectl, "wait", "-n", ops.GetGitOps().GetNamespace(), "deploy/argocd-server", "--for", "condition=available", "--timeout", "5m")
 	if output, err := tkexec.RunCommand(cmd); err != nil {
-		return fmt.Errorf("error waiting for argo server to be ready: %s: %v", string(output), err)
+		return fmt.Errorf("error waiting for argo server to be ready: %s: %v", output, err)
 	}
 	logging.Log().Debugln("argo server started")
 	cmd = exec.Command(a.cmd.Kubectl, "wait", "-n", ops.GetGitOps().GetNamespace(), "deploy/argocd-redis", "--for", "condition=available", "--timeout", "5m")
 	if output, err := tkexec.RunCommand(cmd); err != nil {
-		return fmt.Errorf("error waiting for redis to be ready: %s: %v", string(output), err)
+		return fmt.Errorf("error waiting for redis to be ready: %s: %v", output, err)
 	}
 	logging.Log().Debugln("redis started")
 
@@ -102,9 +101,9 @@ func (a *Agent) deployArgoCD(_ context.Context, ops *kubernetes.Cluster) error {
 		logging.Log().Infoln("Port forward is not required")
 		return nil
 	}
-	// use start because we do not want to wait
 	port := fmt.Sprintf("%s:8080", ops.GetGitOps().GetPort())
 	cmd = exec.Command(a.cmd.Kubectl, "port-forward", "-n", ops.GetGitOps().GetNamespace(), "deploy/argocd-server", port, "--address", "0.0.0.0")
+	// use start because we do not want to wait for the process to finish
 	pid, err := tkexec.StartCommand(cmd)
 	if err != nil {
 		return fmt.Errorf("could not port foward argo server: %v", err)
@@ -127,14 +126,14 @@ func (a *Agent) setAdminPassword(ops *kubernetes.Cluster) error {
 		logger.Log().Infoln("unable to log into argo cd using the initial password, trying config password")
 		cmd = exec.Command(a.cmd.ArgoCD, "login", host, "--username", ops.GetGitOps().GetCredentials().GetUsername(), "--password", ops.GetGitOps().GetCredentials().GetPassword(), "--insecure")
 		if output, err := tkexec.RunCommand(cmd); err != nil {
-			return fmt.Errorf("unable to log into argo cd %s: %v", string(output), err)
+			return fmt.Errorf("unable to log into argo cd %s: %v", output, err)
 		}
 	} else {
 		// change password
 		cmd = exec.Command(a.cmd.ArgoCD, "account", "update-password", "--account", ops.GetGitOps().GetCredentials().GetUsername(), "--current-password",
 			password, "--new-password", ops.GetGitOps().GetCredentials().GetPassword())
 		if output, err := tkexec.RunCommand(cmd); err != nil {
-			return fmt.Errorf("error changing argo cd password: %s: %v", string(output), err)
+			return fmt.Errorf("error changing argo cd password: %s: %v", output, err)
 		}
 	}
 	logging.Log().Debugf("access the UI at: http://%s user: %s password: %s\n", host, ops.GetGitOps().GetCredentials().GetUsername(), ops.GetGitOps().GetCredentials().GetPassword())
@@ -201,7 +200,7 @@ func (a *Agent) AddCluster(_ context.Context, ops, workload *kubernetes.Cluster)
 		"quay.io/argoproj/argocd:latest", "/hack/addCluster.sh", labels+annotations)
 	logging.Log().Debugf("%s\n", cmd.String())
 	if output, err := tkexec.RunCommand(cmd); err != nil {
-		return fmt.Errorf("error adding cluster to gitops agent: %s: %v", string(output), err)
+		return fmt.Errorf("error adding cluster to gitops agent: %s: %v", output, err)
 	}
 	logging.Log().Infof("added cluster %s to argo cd", workload.RequestCluster.GetName())
 	return nil
