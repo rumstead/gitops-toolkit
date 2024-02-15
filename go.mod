@@ -1,8 +1,8 @@
 module github.com/rumstead/gitops-toolkit
 
-go 1.21
+go 1.22
 
-toolchain go1.21.7
+toolchain go1.22.0
 
 require (
 	github.com/ghodss/yaml v1.0.0
