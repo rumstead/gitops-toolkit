@@ -101,14 +101,19 @@ func (a *Agent) deployArgoCD(_ context.Context, ops *kubernetes.Cluster) error {
 		logging.Log().Infoln("Port forward is not required")
 		return nil
 	}
+	// pull bind address from yaml config or default to 0.0.0.0 (maintaining backwards compatibility)
+	bindAddress := "0.0.0.0"
+	if ops.GetGitOps().GetBindAddress() != "" {
+		bindAddress = ops.GetGitOps().GetBindAddress()
+	}
 	port := fmt.Sprintf("%s:8080", ops.GetGitOps().GetPort())
-	cmd = exec.Command(a.cmd.Kubectl, "port-forward", "-n", ops.GetGitOps().GetNamespace(), "deploy/argocd-server", port, "--address", "0.0.0.0")
+	cmd = exec.Command(a.cmd.Kubectl, "port-forward", "-n", ops.GetGitOps().GetNamespace(), "deploy/argocd-server", port, "--address", bindAddress)
 	// use start because we do not want to wait for the process to finish
 	pid, err := tkexec.StartCommand(cmd)
 	if err != nil {
 		return fmt.Errorf("could not port foward argo server: %v", err)
 	}
-	logging.Log().Infof("port forward pid: %d\n", pid)
+	logging.Log().Infof("port forward pid=%d,bind_addr=%s\n", pid, bindAddress)
 	logging.Log().Infoln("argo cd deployed")
 	return nil
 }

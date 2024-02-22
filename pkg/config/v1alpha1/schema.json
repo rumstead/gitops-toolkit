@@ -30,6 +30,9 @@
         },
         "credentials": {
           "$ref": "#/$defs/Credentials"
+        },
+        "bindAddress": {
+          "type": "string"
         }
       },
       "additionalProperties": false,
