@@ -23,6 +23,7 @@ message GitOps {
   string manifestPath = 3;
   bool noPortForward = 4;
   Credentials credentials = 5;
+  string bindAddress = 6;
 }
 
 message Credentials {

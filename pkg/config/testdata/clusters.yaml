@@ -66,6 +66,7 @@ clusters:
       namespace: argocd
       port: '8080'
       manifestPath: "./manifests/argo-cd/"
+      bindAddress: localhost
       credentials:
         username: admin
         password: admin1234
