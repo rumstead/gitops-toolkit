@@ -6,14 +6,13 @@ jobs:
   go-releaser-branches:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup go-task
+      - name: checkout=self
+        uses: actions/checkout@v4
+      - name: task=3.35.1
         uses: pnorton5432/setup-task@v1
         with:
           task-version: 3.35.1
-      - name: task version
-        run: task --version
-      - name: checkout taskfiles
+      - name: checkout=taskfiles
         uses: actions/checkout@v4
         with:
           path: taskfiles
