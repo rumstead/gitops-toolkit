@@ -19,10 +19,10 @@ jobs:
         with:
           path: taskfiles
           repository: bradfordwagner/taskfiles
-      - name: go=1.21
+      - name: go=1.22
         uses: actions/setup-go@v5
         with:
-          go-version: 1.21
+          go-version: 1.22
       - name: goreleaser=1.24.0
         uses: goreleaser/goreleaser-action@v5
         with:
