@@ -1,0 +1,33 @@
+name: go_releaser_branches
+on:
+  - push
+  - workflow_dispatch
+jobs:
+  go-releaser-branches:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup go-task
+        uses: pnorton5432/setup-task@v1
+        with:
+          task-version: 3.35.1
+      - name: task version
+        run: task --version
+      - name: checkout taskfiles
+        uses: actions/checkout@v4
+        with:
+          path: taskfiles
+          repository: bradfordwagner/taskfiles
+      - name: go=1.21
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.21
+      - name: goreleaser=1.24.0
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          version: 1.24.0
+          install-only: true
+      - name: task=branches
+        run: task -t ./taskfiles/tasks/go_releaser.yml is_tag=false
+        env:
+          GITHUB_TOKEN: ${{ github.token }} 
