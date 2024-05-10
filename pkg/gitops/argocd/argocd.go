@@ -101,11 +101,7 @@ func (a *Agent) deployArgoCD(_ context.Context, ops *kubernetes.Cluster) error {
 		logging.Log().Infoln("Port forward is not required")
 		return nil
 	}
-	// pull bind address from yaml config or default to 0.0.0.0 (maintaining backwards compatibility)
-	bindAddress := "0.0.0.0"
-	if ops.GetGitOps().GetBindAddress() != "" {
-		bindAddress = ops.GetGitOps().GetBindAddress()
-	}
+	bindAddress := a.getBindAddress(ops)
 	port := fmt.Sprintf("%s:8080", ops.GetGitOps().GetPort())
 	cmd = exec.Command(a.cmd.Kubectl, "port-forward", "-n", ops.GetGitOps().GetNamespace(), "deploy/argocd-server", port, "--address", bindAddress)
 	// use start because we do not want to wait for the process to finish
@@ -118,13 +114,22 @@ func (a *Agent) deployArgoCD(_ context.Context, ops *kubernetes.Cluster) error {
 	return nil
 }
 
+func (a *Agent) getBindAddress(ops *kubernetes.Cluster) (bindAddress string) {
+	// pull bind address from yaml config or default to 0.0.0.0 (maintaining backwards compatibility)
+	bindAddress = "0.0.0.0"
+	if ops.GetGitOps().GetBindAddress() != "" {
+		bindAddress = ops.GetGitOps().GetBindAddress()
+	}
+	return
+}
+
 func (a *Agent) setAdminPassword(ops *kubernetes.Cluster) error {
 	password, err := a.getInitialPassword(ops)
 	if err != nil {
 		return err
 	}
 
-	host := fmt.Sprintf("localhost:%s", ops.GetGitOps().GetPort())
+	host := fmt.Sprintf("%s:%s", a.getBindAddress(ops), ops.GetGitOps().GetPort())
 	// login
 	cmd := exec.Command(a.cmd.ArgoCD, "login", host, "--username", ops.GetGitOps().GetCredentials().GetUsername(), "--password", password, "--insecure")
 	if _, err := tkexec.RunCommand(cmd); err != nil {
