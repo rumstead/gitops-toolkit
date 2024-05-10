@@ -4,3 +4,4 @@
 /bin/
 /*-toolkit/
 /pkg/config/testdata/clusters-proxy.yaml
+taskfiles/
