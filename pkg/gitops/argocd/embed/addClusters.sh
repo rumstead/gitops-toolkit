@@ -8,7 +8,7 @@ CRI_GATEWAY="${CRI_GATEWAY:-"host.docker.internal"}"
 
 # login
 # https://docs.docker.com/desktop/networking/#i-want-to-connect-from-a-container-to-a-service-on-the-host
-argocd login "$CRI_GATEWAY:$ARGO_PORT" --insecure $ARGOFLAGS --username "$ARGOUSER" --password "$ARGOPASSWD"
+argocd login "$CRI_GATEWAY:$ARGO_PORT" --plaintext $ARGOFLAGS --username "$ARGOUSER" --password "$ARGOPASSWD"
 
 # don't quote $1 so it globs
-argocd cluster add -y --upsert "$CONTEXT" --insecure $ARGOFLAGS --name "$CLUSTER" --kubeconfig "$KUBECONFIG" $1
+argocd cluster add -y --upsert "$CONTEXT" --plaintext $ARGOFLAGS --name "$CLUSTER" --kubeconfig "$KUBECONFIG" $1

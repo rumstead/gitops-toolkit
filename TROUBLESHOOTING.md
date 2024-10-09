@@ -12,5 +12,8 @@ You can control the container gateway hostname via the `CRI_GATEWAY` environment
 - or ip `CRI_GATEWAY=172.18.0.1`
 
 ## Argo is behind a reverse proxy (ingress like treafik)
-You can add required flags, such as `--grpc-web`, to the argocd commands by adding `ARGOFLAGS` an an environment variable.
-Ie, `ARGOFLAGS=--grpc-web`
+You can add required flags, such as `--grpc-web`, to the argocd commands by adding `ARGOFLAGS` an environment variable.
+Eg, `ARGOFLAGS=--grpc-web`
+
+## How do I see more verbose logs?
+Set the environment variable `DEBUG=1` to see more verbose logs.

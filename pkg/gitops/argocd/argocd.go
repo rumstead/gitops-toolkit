@@ -131,10 +131,10 @@ func (a *Agent) setAdminPassword(ops *kubernetes.Cluster) error {
 
 	host := fmt.Sprintf("%s:%s", a.getBindAddress(ops), ops.GetGitOps().GetPort())
 	// login
-	cmd := exec.Command(a.cmd.ArgoCD, "login", host, "--username", ops.GetGitOps().GetCredentials().GetUsername(), "--password", password, "--insecure")
+	cmd := exec.Command(a.cmd.ArgoCD, "login", host, "--username", ops.GetGitOps().GetCredentials().GetUsername(), "--password", password, "--plaintext")
 	if _, err := tkexec.RunCommand(cmd); err != nil {
 		logger.Log().Infoln("unable to log into argo cd using the initial password, trying config password")
-		cmd = exec.Command(a.cmd.ArgoCD, "login", host, "--username", ops.GetGitOps().GetCredentials().GetUsername(), "--password", ops.GetGitOps().GetCredentials().GetPassword(), "--insecure")
+		cmd = exec.Command(a.cmd.ArgoCD, "login", host, "--username", ops.GetGitOps().GetCredentials().GetUsername(), "--password", ops.GetGitOps().GetCredentials().GetPassword(), "--plaintext")
 		if output, err := tkexec.RunCommand(cmd); err != nil {
 			return fmt.Errorf("unable to log into argo cd %s: %v", output, err)
 		}
