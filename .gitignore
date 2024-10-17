@@ -6,3 +6,4 @@
 /pkg/config/testdata/clusters-proxy.yaml
 taskfiles/
 /vendor/
+test.sh
