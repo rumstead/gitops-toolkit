@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -129,25 +130,50 @@ func (a *Agent) setAdminPassword(ops *kubernetes.Cluster) error {
 		return err
 	}
 
+	// yes command - this will auto confirm the unknown ca x509 error
+	yesStdout, err := a.yesOut()
+	if err != nil {
+		return err
+	}
+
 	host := fmt.Sprintf("%s:%s", a.getBindAddress(ops), ops.GetGitOps().GetPort())
 	// login
-	cmd := exec.Command(a.cmd.ArgoCD, "login", host, "--username", ops.GetGitOps().GetCredentials().GetUsername(), "--password", password, "--plaintext")
-	if _, err := tkexec.RunCommand(cmd); err != nil {
-		logger.Log().Infoln("unable to log into argo cd using the initial password, trying config password")
-		cmd = exec.Command(a.cmd.ArgoCD, "login", host, "--username", ops.GetGitOps().GetCredentials().GetUsername(), "--password", ops.GetGitOps().GetCredentials().GetPassword(), "--plaintext")
+	args := []string{"login", host, "--username", ops.GetGitOps().GetCredentials().GetUsername(), "--password", password}
+	logger.Log().Infof("logging into argo cd using the initial password args='%s'", strings.Join(args, " "))
+	cmd := exec.Command(a.cmd.ArgoCD, args...)
+	cmd.Stdin = yesStdout
+	if output, err := tkexec.RunCommand(cmd); err != nil {
+		logger.Log().Infoln("unable to log into argo cd using the initial password, trying config password: ", err.Error())
+		logger.Log().Infoln("output", output)
+
+		cmd = exec.Command(a.cmd.ArgoCD, "login", host, "--username", ops.GetGitOps().GetCredentials().GetUsername(), "--password", ops.GetGitOps().GetCredentials().GetPassword())
+		cmd.Stdin = yesStdout
 		if output, err := tkexec.RunCommand(cmd); err != nil {
 			return fmt.Errorf("unable to log into argo cd %s: %v", output, err)
 		}
 	} else {
+		args = []string{"account", "update-password", "--account", ops.GetGitOps().GetCredentials().GetUsername(), "--current-password",
+			password, "--new-password", ops.GetGitOps().GetCredentials().GetPassword()}
+		logger.Log().Infof("changing password args='%s'", strings.Join(args, " "))
 		// change password
-		cmd = exec.Command(a.cmd.ArgoCD, "account", "update-password", "--account", ops.GetGitOps().GetCredentials().GetUsername(), "--current-password",
-			password, "--new-password", ops.GetGitOps().GetCredentials().GetPassword())
+		cmd = exec.Command(a.cmd.ArgoCD, args...)
+		cmd.Stdin = yesStdout
 		if output, err := tkexec.RunCommand(cmd); err != nil {
 			return fmt.Errorf("error changing argo cd password: %s: %v", output, err)
 		}
 	}
-	logging.Log().Debugf("access the UI at: http://%s user: %s password: %s\n", host, ops.GetGitOps().GetCredentials().GetUsername(), ops.GetGitOps().GetCredentials().GetPassword())
+	logging.Log().Infof("access the UI at: http://%s user: %s password: %s\n", host, ops.GetGitOps().GetCredentials().GetUsername(), ops.GetGitOps().GetCredentials().GetPassword())
 	return nil
+}
+
+func (a *Agent) yesOut() (io.ReadCloser, error) {
+	yesCmd := exec.Command("yes")
+	pipe, err := yesCmd.StdoutPipe()
+	if err != nil {
+		return nil, err
+	}
+	err = yesCmd.Start()
+	return pipe, err
 }
 
 func (a *Agent) getInitialPassword(ops *kubernetes.Cluster) (string, error) {
