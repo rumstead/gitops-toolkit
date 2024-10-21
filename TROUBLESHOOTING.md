@@ -13,6 +13,7 @@ You can control the container gateway hostname via the `CRI_GATEWAY` environment
 
 ## Argo is behind a reverse proxy (ingress like treafik)
 You can add required flags, such as `--grpc-web`, to the argocd commands by adding `ARGOFLAGS` an environment variable.
+`ARGOFLAGS` applies to all the `Argo CD` commands, so ensure it is a global flag. 
 Eg, `ARGOFLAGS=--grpc-web`
 
 ## How do I see more verbose logs?

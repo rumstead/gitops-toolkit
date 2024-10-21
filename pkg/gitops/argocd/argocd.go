@@ -25,11 +25,15 @@ import (
 var shellScript []byte
 
 type Agent struct {
-	cmd *tkexec.Command
+	cmd       *tkexec.Command
+	argoFlags []string
 }
 
 func NewGitOpsEngine(binaries map[string]string) gitops.Engine {
-	return &Agent{cmd: tkexec.NewCommand(binaries)}
+	if err := setupArgoFlags(); err != nil {
+		logging.Log().Errorf("unable to set argo flags: %v", err)
+	}
+	return &Agent{cmd: tkexec.NewCommand(binaries), argoFlags: strings.Split(os.Getenv("ARGOFLAGS"), " ")}
 }
 
 func (a *Agent) Deploy(ctx context.Context, ops *kubernetes.Cluster) error {
@@ -130,18 +134,24 @@ func (a *Agent) setAdminPassword(ops *kubernetes.Cluster) error {
 	}
 
 	host := fmt.Sprintf("%s:%s", a.getBindAddress(ops), ops.GetGitOps().GetPort())
+	loginArgs := []string{"login", host, "--username", ops.GetGitOps().GetCredentials().GetUsername(), "--password", password, "--skip-test-tls"}
+	loginArgs = append(loginArgs, a.argoFlags...)
 	// login
-	cmd := exec.Command(a.cmd.ArgoCD, "login", host, "--username", ops.GetGitOps().GetCredentials().GetUsername(), "--password", password, "--plaintext")
+	cmd := exec.Command(a.cmd.ArgoCD, loginArgs...)
 	if _, err := tkexec.RunCommand(cmd); err != nil {
 		logger.Log().Infoln("unable to log into argo cd using the initial password, trying config password")
-		cmd = exec.Command(a.cmd.ArgoCD, "login", host, "--username", ops.GetGitOps().GetCredentials().GetUsername(), "--password", ops.GetGitOps().GetCredentials().GetPassword(), "--plaintext")
+		loginArgs = []string{"login", host, "--username", ops.GetGitOps().GetCredentials().GetUsername(), "--password", ops.GetGitOps().GetCredentials().GetPassword(), "--skip-test-tls"}
+		loginArgs = append(loginArgs, a.argoFlags...)
+		cmd = exec.Command(a.cmd.ArgoCD, loginArgs...)
 		if output, err := tkexec.RunCommand(cmd); err != nil {
 			return fmt.Errorf("unable to log into argo cd %s: %v", output, err)
 		}
 	} else {
 		// change password
-		cmd = exec.Command(a.cmd.ArgoCD, "account", "update-password", "--account", ops.GetGitOps().GetCredentials().GetUsername(), "--current-password",
-			password, "--new-password", ops.GetGitOps().GetCredentials().GetPassword())
+		accArgs := []string{"account", "update-password", "--account", ops.GetGitOps().GetCredentials().GetUsername(), "--current-password",
+			password, "--new-password", ops.GetGitOps().GetCredentials().GetPassword()}
+		accArgs = append(accArgs, a.argoFlags...)
+		cmd = exec.Command(a.cmd.ArgoCD, accArgs...)
 		if output, err := tkexec.RunCommand(cmd); err != nil {
 			return fmt.Errorf("error changing argo cd password: %s: %v", output, err)
 		}
@@ -208,11 +218,20 @@ func (a *Agent) AddCluster(_ context.Context, ops, workload *kubernetes.Cluster)
 		"-e", "ARGOFLAGS",
 		"-v", workDirVolume,
 		"quay.io/argoproj/argocd:latest", "/hack/addCluster.sh", labels+annotations)
-	logging.Log().Debugf("%s\n", cmd.String())
+	logging.Log().Debugf("%s\n%s", cmd.String(), a.argoFlags)
 	if output, err := tkexec.RunCommand(cmd); err != nil {
 		return fmt.Errorf("error adding cluster to gitops agent: %s: %v", output, err)
 	}
 	logging.Log().Infof("added cluster %s to argo cd", workload.RequestCluster.GetName())
+	return nil
+}
+
+func setupArgoFlags() error {
+	if os.Getenv("ARGOFLAGS") == "" {
+		if err := os.Setenv("ARGOFLAGS", "--insecure --grpc-web"); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
