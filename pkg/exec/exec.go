@@ -21,14 +21,13 @@ func NewCommand(binaries map[string]string) *Command {
 	}
 }
 
-func readStdOut(out chan []byte, reader io.ReadCloser) error {
+func readStdOut(out chan []byte, reader io.ReadCloser) {
 	buf, err := io.ReadAll(reader)
 	if err != nil {
 		logging.Log().Errorf("unable to read stdout of process %v", err)
-		return nil
+		return
 	}
 	out <- buf
-	return nil
 }
 
 func RunCommandCaptureStdOut(cmd *exec.Cmd) ([]byte, error) {
