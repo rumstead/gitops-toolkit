@@ -68,9 +68,9 @@ func (a *Agent) deployArgoCD(_ context.Context, ops *kubernetes.Cluster) error {
 		// we don't want to error out if the namespace already exists
 		if !strings.Contains(output, "already exists") {
 			return fmt.Errorf("error creating namespace: %s: %v", output, err)
-		} else {
-			logging.Log().Infof("using the existing namespace: %s\n", ops.GetGitOps().GetNamespace())
 		}
+
+		logging.Log().Infof("using the existing namespace: %s\n", ops.GetGitOps().GetNamespace())
 	}
 	// 1a. wait for the cluster to be ready
 	logging.Log().Debugln("waiting for cluster to be ready")
@@ -81,7 +81,7 @@ func (a *Agent) deployArgoCD(_ context.Context, ops *kubernetes.Cluster) error {
 
 	logging.Log().Debugln("deploying argo cd")
 	// 2. apply the manifests
-	cmd = exec.Command(a.cmd.Kubectl, "apply", "-n", ops.GetGitOps().GetNamespace(), "-k", ops.GetGitOps().GetManifestPath())
+	cmd = exec.Command(a.cmd.Kubectl, "apply", "--server-side", "--force-conflicts", "-n", ops.GetGitOps().GetNamespace(), "-k", ops.GetGitOps().GetManifestPath())
 	if output, err := tkexec.RunCommand(cmd); err != nil {
 		return fmt.Errorf("error applying argo cd manifests at %s: %s: %v", ops.GetGitOps().GetManifestPath(), output, err)
 	}
