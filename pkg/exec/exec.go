@@ -1,10 +1,8 @@
 package exec
 
 import (
-	"io"
+	"bytes"
 	"os/exec"
-
-	"github.com/rumstead/gitops-toolkit/pkg/logging"
 )
 
 type Command struct {
@@ -21,27 +19,13 @@ func NewCommand(binaries map[string]string) *Command {
 	}
 }
 
-func readStdOut(out chan []byte, reader io.ReadCloser) {
-	buf, err := io.ReadAll(reader)
-	if err != nil {
-		logging.Log().Errorf("unable to read stdout of process %v", err)
-		return
-	}
-	out <- buf
-}
-
 func RunCommandCaptureStdOut(cmd *exec.Cmd) ([]byte, error) {
-	reader, err := cmd.StdoutPipe()
-	if err != nil {
-		return nil, err
-	}
-	out := make(chan []byte)
-	go readStdOut(out, reader)
-
+	var stdout bytes.Buffer
+	cmd.Stdout = &stdout
 	if err := cmd.Run(); err != nil {
 		return nil, err
 	}
-	return <-out, nil
+	return stdout.Bytes(), nil
 }
 
 func RunCommand(cmd *exec.Cmd) (string, error) {

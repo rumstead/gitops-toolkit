@@ -18,9 +18,9 @@ package clusters
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 
 	"github.com/ghodss/yaml"
@@ -74,8 +74,12 @@ func NewClustersCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			workdir := fmt.Sprintf("%s/gitops-toolkit/", outputDir)
-			defer os.RemoveAll(workdir)
+			workdir := filepath.Join(outputDir, "gitops-toolkit")
+			defer func() {
+				if err := os.RemoveAll(workdir); err != nil {
+					logging.Log().Warnf("unable to clean up workdir %s: %v", workdir, err)
+				}
+			}()
 			// create the clusters
 			clusterDistro := k3d.NewK3dDistro(workdir)
 			k8sClusters, err := clusterDistro.CreateClusters(timeoutCtx, &requestedClusters)
@@ -93,16 +97,13 @@ func NewClustersCmd() *cobra.Command {
 
 			// deploy the gitops engine to any enabled clusters
 			gitOpsEngine := argocd.NewGitOpsEngine(binaries)
-			if err != nil {
-				return err
-			}
 
 			for _, ops := range gitopsClusters {
-				if err = gitOpsEngine.Deploy(ctx, ops); err != nil {
+				if err = gitOpsEngine.Deploy(timeoutCtx, ops); err != nil {
 					logging.Log().Fatalf("error deploying gitops: %v", err)
 				}
 
-				if err = gitOpsEngine.AddClusters(ctx, ops, k8sClusters); err != nil {
+				if err = gitOpsEngine.AddClusters(timeoutCtx, ops, k8sClusters); err != nil {
 					logging.Log().Fatalf("error adding cluster to gitops engine: %v", err)
 				}
 			}
@@ -117,7 +118,7 @@ func NewClustersCmd() *cobra.Command {
 
 func getDefaultClusterConfig() (filePath string) {
 	homeDir, _ := os.UserHomeDir()
-	filePath = fmt.Sprintf("%s/.gitops-toolkit-clusters.yaml", homeDir)
+	filePath = filepath.Join(homeDir, ".gitops-toolkit-clusters.yaml")
 	return
 }
 
