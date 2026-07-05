@@ -168,7 +168,7 @@ func (a *Agent) getInitialPassword(ctx context.Context, ops *kubernetes.Cluster)
 	passwordCmd := exec.CommandContext(ctx, a.cmd.Kubectl, "get", "-n", ops.GetGitOps().GetNamespace(), "secret", "argocd-initial-admin-secret", "-o", "jsonpath=\"{.data.password}\"")
 	outputBytes, err := tkexec.RunCommandCaptureStdOut(passwordCmd)
 	if err != nil {
-		return "", fmt.Errorf("error getting argocd password %v", err)
+		return "", fmt.Errorf("error getting argocd password: %w", err)
 	}
 	password := string(outputBytes)
 	// we need to trim the quotes from the base64 string
