@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	k3dcluster "github.com/k3d-io/k3d/v5/cmd/cluster"
 	k3dclient "github.com/k3d-io/k3d/v5/pkg/client"
@@ -28,7 +29,7 @@ func NewK3dDistro(workdir string) kubernetes.Distro {
 }
 
 func (k *K3d) getKubeConfig(ctx context.Context, cluster *v1alpha1.RequestCluster) (string, error) {
-	output := fmt.Sprintf("%s/%s", k.workdir, cluster.GetName())
+	output := filepath.Join(k.workdir, cluster.GetName())
 	_, err := k3dclient.KubeconfigGetWrite(ctx, runtimes.Docker, &types.Cluster{Name: cluster.GetName()}, output, &k3dclient.WriteKubeConfigOptions{
 		UpdateExisting:       true,
 		UpdateCurrentContext: true,
@@ -52,10 +53,10 @@ func (k *K3d) CreateClusters(ctx context.Context, clusters *v1alpha1.RequestClus
 	for _, cluster := range clusters.GetClusters() {
 		log.Debugf("Creating cluster %s", cluster.GetName())
 		k8sCluster, err := k.createCluster(ctx, cluster)
-		k8sClusters = append(k8sClusters, k8sCluster)
 		if err != nil {
 			return nil, err
 		}
+		k8sClusters = append(k8sClusters, k8sCluster)
 	}
 	return k8sClusters, nil
 }
@@ -85,10 +86,7 @@ func parseClusterCreateArgs(cluster *v1alpha1.RequestCluster) []string {
 		args = append(args, arg)
 	}
 
-	for _, v := range cluster.GetAdditionalArgs() {
-		arg := fmt.Sprintf("%s", v)
-		args = append(args, arg)
-	}
+	args = append(args, cluster.GetAdditionalArgs()...)
 	return args
 }
 

@@ -1,32 +1,28 @@
 name: go_releaser_branches
 on:
-  - push
-  - workflow_dispatch
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+permissions:
+  contents: read
 jobs:
   go-releaser-branches:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout=self
-        uses: actions/checkout@v4
-      - name: task=3.35.1
-        uses: pnorton5432/setup-task@v1
+      - name: checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          task-version: 3.35.1
-      - name: checkout=taskfiles
-        uses: actions/checkout@v4
+          fetch-depth: 0
+      - name: setup-go
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
         with:
-          path: taskfiles
-          repository: bradfordwagner/taskfiles
-      - name: go=1.22
-        uses: actions/setup-go@v5
+          go-version-file: go.mod
+      - name: goreleaser snapshot
+        uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
         with:
-          go-version: 1.22
-      - name: goreleaser=1.24.0
-        uses: goreleaser/goreleaser-action@v5
-        with:
-          version: 1.24.0
-          install-only: true
-      - name: task=branches
-        run: task -t ./taskfiles/tasks/go_releaser.yml is_tag=false
+          version: '~> v2'
+          args: release --snapshot --clean
         env:
-          GITHUB_TOKEN: ${{ github.token }} 
+          GITHUB_TOKEN: ${{ github.token }}
+
